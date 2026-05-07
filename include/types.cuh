@@ -12,7 +12,7 @@ struct Region {
 	float min_ix, max_ix;
 	float min_iy, max_iy;
 	float min_iz, max_iz;
-	int mat_id;
+	u_int8_t mat_id;
 };
 
 // Struct Particella
