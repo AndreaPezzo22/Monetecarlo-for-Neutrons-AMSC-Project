@@ -17,12 +17,12 @@ int main() {
     Region h_regions[numRegions];
     Particle h_particle;
 
-    h_regions[0] = {-5, 5, -5, 5, -5, 5, 0}; // L'Acqua riempie la zona da -5 a +5 (ID 0)
-    h_regions[1] = {-1, 1, -1, 1, -1, 1, 1}; // L'Uranio sta al centro da -1 a +1 (ID 1)
+    h_regions[1] = {-50.0, 50.0, -50.0, 50.0, -50.0, 50.0, 0}; // L'Acqua riempie la zona da -5 a +5 (ID 0)
+    h_regions[2] = {-10.0, 10.0, -10.0, 10.0, -10.0, 10.0, 1}; // L'Uranio sta al centro da -1 a +1 (ID 1)
 
-    h_materials[0] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 0)
-    h_materials[1] = {0.2f, 0.8f, 1.00f};  // Uranio (ID 1)
-    h_materials[2] = {0.0f, 0.0f, 0.00f};  // Vuoto (ID 2)
+    h_materials[0] = {0.0f, 0.0f, 0.00f};  // Vuoto (ID 0)
+    h_materials[1] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)
+    h_materials[2] = {0.2f, 0.8f, 1.00f};  // Uranio (ID 2)
 
     cudaMemcpyToSymbol(c_materials, h_materials, 3 * sizeof(Material)); // number hard coded for now
 	cudaMemcpyToSymbol(c_regions, h_regions, numRegions * sizeof(Region));
