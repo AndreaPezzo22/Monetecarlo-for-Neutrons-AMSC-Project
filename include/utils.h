@@ -30,4 +30,10 @@ inline __device__ float3 getRandomDirection(curandState *state) {
     return make_float3(r * cos_theta, r * sin_theta, z);
 }
 
+inline __device__ float getRandomFloat(curandState *state, float min, float max) {
+    // curand_uniform returns a random float in the range (0.0, 1.0]
+    float u = curand_uniform(state);
+    return min + u * (max - min);
+}
+
 #endif // UTILS_H
