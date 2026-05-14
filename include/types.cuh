@@ -7,16 +7,14 @@ struct Material {
 	float sigma_t;
 };
 
-// TODO: redefine as floats for the (0,1) domain
 // Aggiunto Struct Region per definire le posizioni dei materiali 
 struct Region {
-	int min_ix, max_ix;
-	int min_iy, max_iy;
-	int min_iz, max_iz;
-	int mat_id;
+	float min_ix, max_ix;
+	float min_iy, max_iy;
+	float min_iz, max_iz;
+	u_int8_t mat_id;
 };
 
-// TODO: probabilmente da rimuovere
 // Struct Particella
 struct Particle {
 	float x, y, z;

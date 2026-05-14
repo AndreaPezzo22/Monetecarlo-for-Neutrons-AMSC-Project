@@ -17,7 +17,7 @@ __global__ void traverse (float* d_posX, float* d_posY, float* d_posZ,
 	float y = d_posY[id];
 	float z = d_posZ[id];
 	
-	// Calcolo ID materiale
+	// Calcolo ID materiale, make float3 ? per trasformare in un unico argomento
 	prec_matID = getMaterialID(x, y, z);
 
 

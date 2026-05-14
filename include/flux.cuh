@@ -19,6 +19,9 @@
 //  - Uses atomic addition to handle concurrent writes in parallel CUDA kernels.
 //  - Assumes row-major ordering for the flattened 3D array: idx = x + y*gridSize + z*gridSize*gridSize
 
+#ifndef FLUX_CUH
+#define FLUX_CUH
+
 #include "helper_math.h"
 
 inline __device__ int getsign(const float f) {
@@ -92,3 +95,5 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         t.z += stepZ * delta.z;
     }
 }
+
+#endif // FLUX_CUH
