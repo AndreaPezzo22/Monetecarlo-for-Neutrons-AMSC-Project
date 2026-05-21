@@ -23,6 +23,7 @@
 // If it is inside a region, it updates the final material ID to the one corresponding to that region. 
 //If it is not inside any region, it returns the default material ID (Vacuum).
 
+#include "types.h"
 
 extern __constant__ Region c_regions[]; 
 extern __constant__ int c_num_regions; 

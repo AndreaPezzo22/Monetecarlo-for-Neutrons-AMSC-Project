@@ -15,9 +15,4 @@ struct Region {
 	u_int8_t mat_id;
 };
 
-// Struct Particella
-struct Particle {
-	float x, y, z;
-};
-
 #endif

@@ -3,7 +3,7 @@
 // updating the material in case of a change of material.
 //
 // Parameters:
-//  - t: closest intersection point for the particle with the geometry
+//  - intersectionPoint: closest intersection point for the particle with the geometry
 //  - s: random step size sampled previously for the particle
 //  - r: current particle position
 //  - d: particle direction (normalized vector)
@@ -19,12 +19,18 @@
 // the material. Otherwise we advance by the sampled step and choose a new random
 // direction.
 
+#ifndef PREP_NEXT_ITER_CUH
+#define PREP_NEXT_ITER_CUH
+
 #include "helper_math.h"
-#include "materials.cuh"
+#include "sampleFreePath.cuh"
 #include "utils.h"
+#include "materials.cuh"
+
+extern __constant__ Material c_materials[10];
 
 inline __device__ void prepNextIter(const float3 intersectionPoint,
-                                   const float s,
+                                   float &s,
                                    float3 &r,
                                    float3 &d,
                                    u_int8_t &material,
@@ -41,18 +47,30 @@ inline __device__ void prepNextIter(const float3 intersectionPoint,
         const bool hitZ = nextPos.z < 0.0f || nextPos.z > 1.0f;
 
         if (hitX || hitY || hitZ) {
+            r -= d * epsilon; // Move back slightly to avoid sticking to the boundary
             if (hitX) d.x = -d.x;
             if (hitY) d.y = -d.y;
             if (hitZ) d.z = -d.z;
+            s -= distanceToIntersection;
         } else {
             // Case 2: particle is not at a boundary but is changing material.
             // We update the material.
-            material = getMaterialID(nextPos);
+            u_int8_t mat= getMaterialID(nextPos);
+            r = nextPos;
+            if (material == mat) {
+                s -= distanceToIntersection;
+            } else {
+                material = mat;
+                s = sampleFreePath(c_materials[material].sigma_t, state);
+            }
         }
 
         // TODO: handle absorption if boundaries are absorbing
     } else {
+        s = sampleFreePath(c_materials[material].sigma_t, state);
         r = r + d * s;
         d = getRandomDirection(state);
     }
 }
+
+#endif // PREP_NEXT_ITER_CUH

@@ -2,7 +2,7 @@
 #ifndef MOVEMENT_CUH
 #define MOVEMENT_CUH
 
-#include "types.cuh"
+#include "types.h"
 #include "materials.cuh"
 
 extern __constant__ Region c_regions[]; 
@@ -36,7 +36,7 @@ inline __device__ float intersectAABB(float3 pos, float3 inv_dir, float3 box_min
 }
 
 inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir){
-    float closest_dist = 1.7320508f; // sqrt(2)
+    float closest_dist = 1.7320508f; // sqrt(3)
     
     // Precompute the inverse of direction, to minimize the number of divisions(multiplication is faster)
     float3 inv_dir = make_float3(1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z);

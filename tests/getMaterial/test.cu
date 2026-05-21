@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cuda_runtime.h>
-#include "../../include/types.cuh"  // Per Region, Material
-#include "../../include/materials.cuh"  // Per getMaterialID
+#include "types.h"  // Per Region, Material
+#include "materials.cuh"  // Per getMaterialID
 
 
 __constant__ Material c_materials[10];

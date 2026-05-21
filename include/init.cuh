@@ -18,8 +18,14 @@
 
 #include <curand_kernel.h>
 #include "utils.h"
+#include "types.h"
+#include "materials.cuh"
+#include "sampleFreePath.cuh"
 
-__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, curandState* randState, int N, unsigned long long seed) {
+
+extern __constant__ Material c_materials[10];
+
+__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, curandState* randState, int N, unsigned long long seed) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= N) return;
 
@@ -28,14 +34,18 @@ __global__ void init(float* posx, float* posy, float* posz, float* dirx, float* 
 
     curandState *state = &randState[id];
     // Set initial random positions (for example, within a unit cube)
-    posx[id] = curand_uniform(state);
-    posy[id] = curand_uniform(state);
-    posz[id] = curand_uniform(state);
+    float3 pos = make_float3(curand_uniform(state), curand_uniform(state), curand_uniform(state));
+    posx[id] = pos.x;
+    posy[id] = pos.y;
+    posz[id] = pos.z;
 
     float3 dir = getRandomDirection(state);
     dirx[id] = dir.x;
     diry[id] = dir.y;
     dirz[id] = dir.z;
+
+    u_int8_t matID = getMaterialID(pos);
+    step[id] = sampleFreePath(c_materials[matID].sigma_t, &randState[id]);
 
 }
 
