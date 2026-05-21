@@ -4,6 +4,7 @@
 // Firme delle funzioni di utilità C++ (lettura file, statistiche)
 #include <curand_kernel.h>
 #include "math_constants.h"
+#include <fstream>
 
 inline __device__ float3 getRandomDirection(curandState *state) {
     // curand_uniform returns a random float in the range (0.0, 1.0]
@@ -35,5 +36,7 @@ inline __device__ float getRandomFloat(curandState *state, float min, float max)
     float u = curand_uniform(state);
     return min + u * (max - min);
 }
+
+void save_to_vtk(const char *filename, const double* grid, const uint edgeN, const double voxelSize);
 
 #endif // UTILS_H

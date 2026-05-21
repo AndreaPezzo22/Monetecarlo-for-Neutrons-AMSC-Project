@@ -1,5 +1,6 @@
 #include "types.h"
 #include "init.cuh"
+#include "utils.h"
 #include "kernel.cuh"
 #include <cassert>
 
@@ -60,6 +61,12 @@ int main() {
     cudaMallocManaged(&grid, sizeof(double) * *gridSize);
 
     mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, grid, gridSize, voxelSize, state);
+    err = cudaGetLastError();
+    assert(err == cudaSuccess);
+    err = cudaDeviceSynchronize();
+    assert(err == cudaSuccess);
+
+    save_to_vtk("output.vtk", grid, edgeN, *voxelSize);
 
     cudaFree(posx);
     cudaFree(posy);

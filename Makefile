@@ -11,7 +11,7 @@ NVCC_FLAGS = -O3 -rdc=true -arch=sm_80 -Iinclude
 
 # --- Files ---
 # List all of your .cu source files here
-SRCS = src/main.cu
+SRCS = src/main.cu src/utils.cpp
 
 # This automatically creates a list of object files (.o) from your source files (.cu)
 OBJS = $(SRCS:.cu=.o)
