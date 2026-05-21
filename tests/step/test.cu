@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
-#include "../../include/types.cuh"
-#include "../../include/sampleFreePath.cuh"
+#include "types.h"
+#include "sampleFreePath.cuh"
 
 __constant__ Material c_materials[10];
 __constant__ Region c_regions[20];
