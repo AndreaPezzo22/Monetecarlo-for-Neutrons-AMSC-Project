@@ -1,0 +1,12 @@
+{
+  "simulation": {
+    "numParticles": 1000000,
+    "source": { "x": -50.0, "y": 0.0, "z": 0.0 }
+  },
+  "regions": [
+    { "min_x": -40.0, "max_x": 40.0, "min_y": 2.0, "max_y": 20.0, "min_z": -20.0, "max_z": 20.0, "material_name": "cadmium" },
+    { "min_x": -40.0, "max_x": 40.0, "min_y": -20.0, "max_y": -2.0, "min_z": -20.0, "max_z": 20.0, "material_name": "cadmium" },
+    { "min_x": -40.0, "max_x": 40.0, "min_y": -2.0, "max_y": 2.0, "min_z": 2.0, "max_z": 20.0, "material_name": "cadmium" },
+    { "min_x": -40.0, "max_x": 40.0, "min_y": -2.0, "max_y": 2.0, "min_z": -20.0, "max_z": -2.0, "material_name": "cadmium" }
+  ]
+}

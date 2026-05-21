@@ -21,7 +21,7 @@
 // Behavior:
 // At each iteration, the function checks if the particle's position is inside any of the defined regions.
 // If it is inside a region, it updates the final material ID to the one corresponding to that region. 
-//If it is not inside any region, it returns the default material ID (Vacuum).
+// If it is not inside any region, it returns the default material ID (Vacuum).
 
 
 extern __constant__ Region c_regions[]; 
@@ -42,3 +42,15 @@ __device__ inline u_int8_t getMaterialID(float3 pos) {
 }
 	
 #endif
+
+/*
+	Nel readme del progetto va specificato che per evitare problemi nella selezione del materiale.
+	La funzione fa un return dell ultimo materiale trovato, se il punto è dentro più regioni. 
+	Quindi è importante che le regioni siano definite in ordine di priorità, con le regioni più specifiche 
+	(ad esempio, un oggetto all'interno di un altro) definite dopo quelle più generali (ad esempio, il vuoto circostante). 
+	In questo modo, se un punto è all'interno di più regioni, verrà restituito il materiale della regione più specifica.
+
+	La soluzione eventuale è quella di segmentare i confini tra le regioni, in modo che non ci siano sovrapposizioni.
+	Senza il bisogno di segmentare la regione di base (vacuum) che è sempre presente, ma segmentare le regioni più 
+	specifiche in modo che non si sovrappongano tra loro.
+*/

@@ -1,0 +1,11 @@
+{
+  "simulation": {
+    "numParticles": 1000000,
+    "source": { "x": -20.0, "y": 0.0, "z": 0.0 }
+  },
+  "regions": [
+    { "min_x": 0.0, "max_x": 10.0, "min_y": -50.0, "max_y": 50.0, "min_z": -50.0, "max_z": 50.0, "material_name": "iron" },
+    { "min_x": 10.0, "max_x": 30.0, "min_y": -50.0, "max_y": 50.0, "min_z": -50.0, "max_z": 50.0, "material_name": "water" },
+    { "min_x": 30.0, "max_x": 35.0, "min_y": -50.0, "max_y": 50.0, "min_z": -50.0, "max_z": 50.0, "material_name": "boron" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "vacuum":   { "sigma_s": 0.00, "sigma_a": 0.00, "sigma_t": 0.00 },
+  "water":    { "sigma_s": 0.80, "sigma_a": 0.05, "sigma_t": 0.85 },
+  "graphite": { "sigma_s": 0.40, "sigma_a": 0.01, "sigma_t": 0.41 },
+  "concrete": { "sigma_s": 0.30, "sigma_a": 0.10, "sigma_t": 0.40 },
+  "iron":     { "sigma_s": 0.60, "sigma_a": 0.20, "sigma_t": 0.80 },
+  "lead":     { "sigma_s": 0.50, "sigma_a": 0.15, "sigma_t": 0.65 },
+  "cadmium":  { "sigma_s": 0.05, "sigma_a": 0.90, "sigma_t": 0.95 },
+  "boron":    { "sigma_s": 0.10, "sigma_a": 0.80, "sigma_t": 0.90 },
+  "uranium":  { "sigma_s": 0.20, "sigma_a": 0.30, "sigma_t": 0.50 }
+}
