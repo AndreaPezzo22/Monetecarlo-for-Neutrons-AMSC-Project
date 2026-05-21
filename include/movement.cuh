@@ -35,9 +35,8 @@ inline __device__ float intersectAABB(float3 pos, float3 inv_dir, float3 box_min
     return -1.0f; // Represents no intersection
 }
 
-inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir, float step){
-    float closest_dist = step; 
-    bool hit = false;
+inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir){
+    float closest_dist = 1.7320508f; // sqrt(2)
     
     // Precompute the inverse of direction, to minimize the number of divisions(multiplication is faster)
     float3 inv_dir = make_float3(1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z);
@@ -47,7 +46,6 @@ inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir,
     
     if (dist_domain > 0.0f && dist_domain < closest_dist) {
         closest_dist = dist_domain;
-        hit = true;
     }
 
     // Check intersections with material regions
@@ -60,12 +58,11 @@ inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir,
         float dist = intersectAABB(pos, inv_dir, box_min, box_max);
         if (dist > 0.0f && dist < closest_dist) {
             closest_dist = dist;
-            hit = true;
         }
     }
 
     // Return the closest distance if an intersection occurred before 'step', otherwise return -1.0f
-    return hit ? closest_dist : -1.0f;
+    return closest_dist;
 }
 
 #endif
