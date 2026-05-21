@@ -43,10 +43,8 @@ int main() {
 
     // Launch kernel with a valid block size and enough blocks for N threads
     init<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, state, N, 42ULL);
-    cudaError_t err = cudaGetLastError();
-    assert(err == cudaSuccess);
-    err = cudaDeviceSynchronize();
-    assert(err == cudaSuccess);
+    CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
+    CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
     uint edgeN = 100;
     uint gridSize = edgeN * edgeN * edgeN;
@@ -57,10 +55,8 @@ int main() {
     cudaMallocManaged(&grid, sizeof(double) * gridSize);
 
     mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, gridSize, voxelSize, state);
-    err = cudaGetLastError();
-    assert(err == cudaSuccess);
-    err = cudaDeviceSynchronize();
-    assert(err == cudaSuccess);
+    CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
+    CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
     save_to_vtk("output.vtk", grid, edgeN, voxelSize);
 

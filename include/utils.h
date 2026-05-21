@@ -5,6 +5,7 @@
 #include <curand_kernel.h>
 #include "math_constants.h"
 #include <fstream>
+#include <iostream>
 
 inline __device__ float3 getRandomDirection(curandState *state) {
     // curand_uniform returns a random float in the range (0.0, 1.0]
@@ -35,6 +36,17 @@ inline __device__ float getRandomFloat(curandState *state, float min, float max)
     // curand_uniform returns a random float in the range (0.0, 1.0]
     float u = curand_uniform(state);
     return min + u * (max - min);
+}
+
+#define CUDA_CHECK(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      std::cerr << "CUDA Error: " << cudaGetErrorString(code) 
+                << " at " << file << ":" << line << std::endl;
+      if (abort) exit(code);
+   }
 }
 
 void save_to_vtk(const char *filename, const double* grid, const uint edgeN, const double voxelSize);
