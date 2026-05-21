@@ -54,7 +54,7 @@ int main() {
     double *grid;
     cudaMallocManaged(&grid, sizeof(double) * gridSize);
 
-    mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, gridSize, voxelSize, state);
+    mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, edgeN, voxelSize, state);
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 

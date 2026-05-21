@@ -11,7 +11,7 @@
 
 
 
-__global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, const uint N, double* grid, const uint gridSize, const double voxelSize, curandState* randState) {
+__global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, const uint N, double* grid, const uint edgeN, const double voxelSize, curandState* randState) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= N) return;
 
@@ -20,7 +20,7 @@ __global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, f
     float s = step[id];
     float distance = getDistanceToNearestIntersection(pos, dir);
     float min_step = fminf(s, distance);
-    flux(pos, pos + dir * min_step, grid, gridSize, voxelSize);
+    flux(pos, pos + dir * min_step, grid, edgeN, voxelSize);
     u_int8_t matID = getMaterialID(pos);
     prepNextIter(pos + dir * distance, s, pos, dir, matID, &randState[id]);
     posx[id] = pos.x;
