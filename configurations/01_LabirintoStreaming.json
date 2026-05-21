@@ -1,8 +1,8 @@
 {
-  "simulation": {
-    "numParticles": 2000000,
-    "source": { "x": -40.0, "y": 0.0, "z": 0.0 }
-  },
+  "numParticles": 2000000,
+  "numGridIntervals": 100, 
+  "source": { "min_x": -50.0, "max_x": -40.0, "min_y": -10.0, "max_y": 10.0, "min_z": -10.0, "max_z": 10.0},
+  "default": "water",
   "regions": [
     { "min_x": -50.0, "max_x": 50.0, "min_y": 10.0, "max_y": 50.0, "min_z": -10.0, "max_z": 10.0, "material_name": "concrete" },
     { "min_x": -50.0, "max_x": -10.0, "min_y": -50.0, "max_y": -10.0, "min_z": -10.0, "max_z": 10.0, "material_name": "concrete" },
