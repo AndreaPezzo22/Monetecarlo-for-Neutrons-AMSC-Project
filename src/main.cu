@@ -49,24 +49,20 @@ int main() {
     assert(err == cudaSuccess);
 
     uint edgeN = 100;
-    uint *gridSize;
-    double *voxelSize;
+    uint gridSize = edgeN * edgeN * edgeN;
+    double voxelSize = 1.0 / edgeN;
 
-    cudaMallocManaged(&gridSize, sizeof(uint));
-    cudaMallocManaged(&voxelSize, sizeof(double));
-    *gridSize = edgeN * edgeN * edgeN;
-    *voxelSize = 1.0 / edgeN;
 
     double *grid;
-    cudaMallocManaged(&grid, sizeof(double) * *gridSize);
+    cudaMallocManaged(&grid, sizeof(double) * gridSize);
 
-    mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, grid, gridSize, voxelSize, state);
+    mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, gridSize, voxelSize, state);
     err = cudaGetLastError();
     assert(err == cudaSuccess);
     err = cudaDeviceSynchronize();
     assert(err == cudaSuccess);
 
-    save_to_vtk("output.vtk", grid, edgeN, *voxelSize);
+    save_to_vtk("output.vtk", grid, edgeN, voxelSize);
 
     cudaFree(posx);
     cudaFree(posy);
@@ -75,7 +71,5 @@ int main() {
     cudaFree(diry);
     cudaFree(dirz);
     cudaFree(state);
-    cudaFree(gridSize);
-    cudaFree(voxelSize);
     cudaFree(grid);
 }
