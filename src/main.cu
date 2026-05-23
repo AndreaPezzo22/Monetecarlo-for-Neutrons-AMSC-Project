@@ -14,8 +14,8 @@ int main() {
 	Material h_materials[3];
     Region h_regions[numRegions];
 
-    h_regions[0] = {-50.0, 50.0, -50.0, 50.0, -50.0, 50.0, 1}; // L'Acqua riempie la zona da -5 a +5 (ID 1)
-    h_regions[1] = {-10.0, 10.0, -10.0, 10.0, -10.0, 10.0, 2}; // L'Uranio sta al centro da -1 a +1 (ID 2)
+    h_regions[0] = {0.2f, 0.8f, 0.2f, 0.8f, 0.2f, 0.8f, 1}; // L'Acqua riempie la zona da -5 a +5 (ID 1)
+    h_regions[1] = {0.3f, 0.7f, 0.3f, 0.7f, 0.3f, 0.7f, 2}; // L'Uranio sta al centro da -1 a +1 (ID 2)
 
     h_materials[0] = {0.0f, 0.0f, 0.00f};  // Vuoto (ID 0)
     h_materials[1] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)

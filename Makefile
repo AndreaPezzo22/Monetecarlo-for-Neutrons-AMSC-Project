@@ -16,6 +16,9 @@ SRCS = src/main.cu src/utils.cpp
 # This automatically creates a list of object files (.o) from your source files (.cu)
 OBJS = $(SRCS:.cu=.o)
 
+# To save changes also in include files
+HEADERS = $(wildcard include/*.h include/*.cuh)
+
 # The name of your final executable program
 TARGET = sim 
 
@@ -28,8 +31,12 @@ $(TARGET): $(OBJS)
 	$(NVCC) $(NVCC_FLAGS) -o $@ $^
 
 # Rule to compile individual .cu files into .o object files
-%.o: %.cu
+%.o: %.cu $(HEADERS) 
 	$(NVCC) $(NVCC_FLAGS) -c $< -o $@
+
+%.o: %.cpp $(HEADERS)
+	$(NVCC) $(NVCC_FLAGS) -c $< -o $@ 
+
 
 # Rule to clean up the compiled files
 clean:

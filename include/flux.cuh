@@ -69,12 +69,17 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         
         // Length of the segment within the current voxel
         float segment = fminf(tNext, tMax) - tCur;
-        
-        // Compute the flattened index for the current voxel
+
+	// Check on the boundaries, if the particle is out of the grid we do not update the flux        
+	if (n.x >= 0 && n.x < gridSize && 
+            n.y >= 0 && n.y < gridSize && 
+            n.z >= 0 && n.z < gridSize) {
+	// Compute the flattened index for the current voxel
         int idx = n.x + n.y * gridSize + n.z * gridSize * gridSize;
         
         // Atomically add the segment length to the flux tally for this voxel
         atomicAdd(&grid[idx], (double)segment);
+	}	
 
         // Advance to the next intersection point
         tCur = tNext;

@@ -19,10 +19,16 @@
 // which is commonly used in Monte Carlo simulations of particle transport. If sigma_t is zero 
 // or negative, it returns infinity, indicating that the particle will not interact and can travel indefinitely.
 
+// We must be sure that when we call the function we handle correctly the 
+// CUDART_INF_F value
+
 #include "utils.h"
 
 __device__ inline float sampleFreePath(float sigma_t, curandState *state) {
-    if (sigma_t <= 0.0f) return CUDART_INF_F; // Se sigma_t è zero o negativo, il passo è infinito (non avviene alcuna interazione)
+    if (sigma_t <= 0.0f) {
+//	 printf("Sigma_t = 0");
+	 return CUDART_INF_F; // Se sigma_t è zero o negativo, il passo è infinito (non avviene alcuna interazione)
+    }
     return -logf(getRandomFloat(state, 0.0f, 1.0f)) / sigma_t;
 }
 
