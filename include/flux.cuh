@@ -71,14 +71,14 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         float segment = fminf(tNext, tMax) - tCur;
 
 	// Check on the boundaries, if the particle is out of the grid we do not update the flux        
-	if (n.x >= 0 && n.x < gridSize && 
-            n.y >= 0 && n.y < gridSize && 
-            n.z >= 0 && n.z < gridSize) {
-	// Compute the flattened index for the current voxel
-        int idx = n.x + n.y * gridSize + n.z * gridSize * gridSize;
+	if ((int)n.x >= 0 && (int)n.x < gridSize && 
+            (int)n.y >= 0 && (int)n.y < gridSize && 
+            (int)n.z >= 0 && (int)n.z < gridSize) {
+		// Compute the flattened index for the current voxel
+        	size_t idx = n.x + n.y * gridSize + n.z * gridSize * gridSize;
         
-        // Atomically add the segment length to the flux tally for this voxel
-        atomicAdd(&grid[idx], (double)segment);
+        	// Atomically add the segment length to the flux tally for this voxel
+        	atomicAdd(&grid[idx], (double)segment);
 	}	
 
         // Advance to the next intersection point
@@ -90,14 +90,23 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         int stepZ = (tNext == t.z);
 
         // Update voxel index and t value for the stepped axis
-        n.x += stepX * sign.x;
-        t.x += stepX * delta.x;
-
-        n.y += stepY * sign.y;
-        t.y += stepY * delta.y;
-
-        n.z += stepZ * sign.z;
-        t.z += stepZ * delta.z;
+        
+	// Previene la corruzione da NaN (0 * Inf = NaN).
+	// Se la particella si muove parallela a un asse, delta diventa +Inf e step diventa 0.
+	// Usare blocchi if() invece di calcolare "t += step * delta" evita l'operazione
+	// matematica indefinita che corromperebbe la memoria.
+        if (stepX) {
+            n.x += sign.x;
+            t.x += delta.x;
+        }
+        if (stepY) {
+            n.y += sign.y;
+            t.y += delta.y;
+        }
+        if (stepZ) {
+            n.z += sign.z;
+            t.z += delta.z;
+        }
     }
 }
 

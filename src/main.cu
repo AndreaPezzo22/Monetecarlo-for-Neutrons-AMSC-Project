@@ -25,7 +25,7 @@ int main() {
     cudaMemcpyToSymbol(c_regions, h_regions, numRegions * sizeof(Region));
     cudaMemcpyToSymbol(c_materials, h_materials, 3 * sizeof(Material));
     cudaMemcpyToSymbol(c_num_regions, &numRegions, sizeof(int));
-    int N = 10000;
+    int N = 100;
     const int blockSize = 256;
     const int numBlocks = (N + blockSize - 1) / blockSize;
 
@@ -53,6 +53,8 @@ int main() {
 
     double *grid;
     cudaMallocManaged(&grid, sizeof(double) * gridSize);
+
+    cudaMemset(grid, 0, sizeof(double) * gridSize);
 
     mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, edgeN, voxelSize, state);
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)

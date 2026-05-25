@@ -67,10 +67,15 @@ inline __device__ void prepNextIter(const float3 intersectionPoint,
 
         // TODO: handle absorption if boundaries are absorbing
     } else {
-        s = sampleFreePath(c_materials[material].sigma_t, state);
+    
+        // Prima la particella avanza della distanza s vecchia rimasta
         r = r + d * s;
+    
+        // Dopo viene campionato il nuovo step per il prossimo ciclo
+        s = sampleFreePath(c_materials[material].sigma_t, state);
+    
+        // Campionamento nuova direzione di scattering
         d = getRandomDirection(state);
     }
 }
-
 #endif // PREP_NEXT_ITER_CUH
