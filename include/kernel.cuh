@@ -14,6 +14,9 @@
 __global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, const uint N, double* grid, const uint edgeN, const double voxelSize, curandState* randState) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= N) return;
+    if (id % 10000 == 0) {
+        printf("Processing particle %d / %d\n", id, N);
+    }
 
     float3 pos = make_float3(posx[id], posy[id], posz[id]);
     float3 dir = make_float3(dirx[id], diry[id], dirz[id]);

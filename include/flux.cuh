@@ -79,7 +79,7 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         
         	// Atomically add the segment length to the flux tally for this voxel
         	atomicAdd(&grid[idx], (double)segment);
-	}	
+	}
 
         // Advance to the next intersection point
         tCur = tNext;

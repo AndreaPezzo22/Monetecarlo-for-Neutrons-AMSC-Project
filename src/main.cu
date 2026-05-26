@@ -9,27 +9,32 @@ __constant__ Region c_regions[20];
 __constant__ int c_num_regions; // num regions
 
 int main() {
-    const int numRegions = 2;
+    std::cout << "Starting simulation..." << std::endl;
+    const int numRegions = 3;
     
-	Material h_materials[3];
+	Material h_materials[4];
     Region h_regions[numRegions];
 
     h_regions[0] = {0.2f, 0.8f, 0.2f, 0.8f, 0.2f, 0.8f, 1}; // L'Acqua riempie la zona da -5 a +5 (ID 1)
     h_regions[1] = {0.3f, 0.7f, 0.3f, 0.7f, 0.3f, 0.7f, 2}; // L'Uranio sta al centro da -1 a +1 (ID 2)
+    h_regions[2] = {0.4f, 0.5f, 0.4f, 0.5f, 0.4f, 0.5f, 3}; // L'Uranio sta al centro da -1 a +1 (ID 2)
 
     h_materials[0] = {0.0f, 0.0f, 0.00f};  // Vuoto (ID 0)
     h_materials[1] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)
     h_materials[2] = {0.2f, 0.8f, 1.00f};  // Uranio (ID 2)
+    h_materials[3] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)
 
     // Copia su GPU
+    std::cout << "Copying data to GPU..." << std::endl;
     cudaMemcpyToSymbol(c_regions, h_regions, numRegions * sizeof(Region));
     cudaMemcpyToSymbol(c_materials, h_materials, 3 * sizeof(Material));
     cudaMemcpyToSymbol(c_num_regions, &numRegions, sizeof(int));
-    int N = 100;
-    const int blockSize = 256;
+    int N = 1000000000;
+    const int blockSize = 1024;
     const int numBlocks = (N + blockSize - 1) / blockSize;
 
     // ── Allocate unified memory (accessible on both CPU and GPU)
+    std::cout << "Allocating memory..." << std::endl;
     float *posx, *posy, *posz, *dirx, *diry, *dirz, *step;
     curandState* state;
     cudaMallocManaged(&posx, sizeof(float) * N);
@@ -55,7 +60,6 @@ int main() {
     cudaMallocManaged(&grid, sizeof(double) * gridSize);
 
     cudaMemset(grid, 0, sizeof(double) * gridSize);
-
     mainKernel<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, edgeN, voxelSize, state);
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)

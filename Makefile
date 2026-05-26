@@ -10,11 +10,14 @@ NVCC = nvcc
 NVCC_FLAGS = -O3 -rdc=true -arch=sm_80 -Iinclude
 
 # --- Files ---
-# List all of your .cu source files here
-SRCS = src/main.cu src/utils.cpp
+# CUDA source files
+CU_SRCS = src/main.cu
+# C++ source files
+CPP_SRCS = src/utils.cpp
 
-# This automatically creates a list of object files (.o) from your source files (.cu)
-OBJS = $(SRCS:.cu=.o)
+CU_OBJS = $(CU_SRCS:.cu=.o)
+CPP_OBJS = $(CPP_SRCS:.cpp=.o)
+OBJS = $(CU_OBJS) $(CPP_OBJS)
 
 # To save changes also in include files
 HEADERS = $(wildcard include/*.h include/*.cuh)
