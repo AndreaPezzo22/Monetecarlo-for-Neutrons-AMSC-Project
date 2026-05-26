@@ -41,11 +41,11 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
     float3 delta = voxelSize / fabs(dir);
     
     // Determine the starting voxel indices by flooring the position divided by voxelSize
-    uint3 n = make_uint3(
-        (uint)floorf(r0.x / voxelSize),
-        (uint)floorf(r0.y / voxelSize),
-        (uint)floorf(r0.z / voxelSize)
-    );
+    int startX = max(0, min((int)gridSize - 1, (int)floorf(r0.x / voxelSize)));
+    int startY = max(0, min((int)gridSize - 1, (int)floorf(r0.y / voxelSize)));
+    int startZ = max(0, min((int)gridSize - 1, (int)floorf(r0.z / voxelSize)));
+    
+    uint3 n = make_uint3((uint)startX, (uint)startY, (uint)startZ);
 
     // Get the sign of each direction component (+1 or -1)
     int3 sign = signOfDir(dir);
@@ -69,6 +69,8 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         
         // Length of the segment within the current voxel
         float segment = fminf(tNext, tMax) - tCur;
+        
+	printf("The position of n is %d, %d, %d\n", n.x, n.y, n.z);
 
 	// Check on the boundaries, if the particle is out of the grid we do not update the flux        
 	if ((int)n.x >= 0 && (int)n.x < gridSize && 
@@ -106,6 +108,12 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         if (stepZ) {
             n.z += sign.z;
             t.z += delta.z;
+        }
+
+	if ((int)n.x < 0 || (int)n.x >= (int)gridSize || 
+            (int)n.y < 0 || (int)n.y >= (int)gridSize || 
+            (int)n.z < 0 || (int)n.z >= (int)gridSize) {
+            break; 
         }
     }
 }
