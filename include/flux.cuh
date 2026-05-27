@@ -33,6 +33,12 @@ inline __device__ int3 signOfDir(const float3 dir) {
 }
 
 inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, double voxelSize) {
+
+    float tMax = length(rf - r0);
+    if (tMax < 1e-7f) {
+        return; // Segmento nullo, usciamo senza fare calcoli
+    }
+
     // Normalize the direction vector from r0 to rf
     float3 dir = normalize(rf - r0);
     
@@ -58,7 +64,7 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
     float3 t = (make_float3(n + make_uint3(step)) * voxelSize - r0) / dir;
 
     // Total length of the segment
-    float tMax = length(rf - r0);
+    //float tMax = length(rf - r0);
     // Current distance traveled along the ray
     float tCur = 0.0f;
 
@@ -69,8 +75,12 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         
         // Length of the segment within the current voxel
         float segment = fminf(tNext, tMax) - tCur;
+
+	if (segment < 0.0f) {
+            segment = 0.0f;
+        }
         
-	printf("The position of n is %d, %d, %d\n", n.x, n.y, n.z);
+	// printf("The position of n is %d, %d, %d\n", n.x, n.y, n.z);
 
 	// Check on the boundaries, if the particle is out of the grid we do not update the flux        
 	if ((int)n.x >= 0 && (int)n.x < gridSize && 
