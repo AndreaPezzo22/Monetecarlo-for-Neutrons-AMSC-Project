@@ -28,6 +28,7 @@ public:
     int getNumParticles() const { return numParticles; }
     int getNumGridIntervals() const { return numGridIntervals; }
     float getMaxSpan() const { return max_span; }
+    Region getSourceRegion() const { return source; }
 
     const std::vector<Material>& getMaterials() const { return materials; }
     size_t getMaterialsBytes() const { return materials.size()*sizeof(Material); } // Needed for MemCopy
