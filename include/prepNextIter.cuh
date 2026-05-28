@@ -29,53 +29,58 @@
 
 extern __constant__ Material c_materials[10];
 
-inline __device__ void prepNextIter(const float3 intersectionPoint,
-                                   float &s,
-                                   float3 &r,
-                                   float3 &d,
+inline __device__ bool prepNextIter(const float3 intersectionPoint,
+                                   float &step,
+                                   float3 &initialPos,
+                                   float3 &dir,
                                    u_int8_t &material,
                                    curandState *state) {
     const float epsilon = 1e-6f;
-    const float distanceToIntersection = length(intersectionPoint - r);
+    const float distanceToIntersection = length(intersectionPoint - initialPos);
 
-    if (distanceToIntersection <= s) {
-        r = intersectionPoint;
-        const float3 nextPos = r + d * epsilon;
+    if (distanceToIntersection <= step) {
+        initialPos = intersectionPoint;
+        const float3 nextPos = initialPos + dir * epsilon;
 
         const bool hitX = nextPos.x < 0.0f || nextPos.x > 1.0f;
         const bool hitY = nextPos.y < 0.0f || nextPos.y > 1.0f;
         const bool hitZ = nextPos.z < 0.0f || nextPos.z > 1.0f;
 
         if (hitX || hitY || hitZ) {
-            r -= d * epsilon; // Move back slightly to avoid sticking to the boundary
-            if (hitX) d.x = -d.x;
-            if (hitY) d.y = -d.y;
-            if (hitZ) d.z = -d.z;
-            s -= distanceToIntersection;
+            initialPos -= dir * epsilon; // Move back slightly to avoid sticking to the boundary
+            if (hitX) dir.x = -dir.x;
+            if (hitY) dir.y = -dir.y;
+            if (hitZ) dir.z = -dir.z;
+            step -= distanceToIntersection;
+            printf("Boundary hit at (%f, %f, %f), new direction: (%f, %f, %f)\n", initialPos.x, initialPos.y, initialPos.z, dir.x, dir.y, dir.z);
         } else {
             // Case 2: particle is not at a boundary but is changing material.
             // We update the material.
             u_int8_t mat= getMaterialID(nextPos);
-            r = nextPos;
+            initialPos = nextPos;
             if (material == mat) {
-                s -= distanceToIntersection;
+                step -= distanceToIntersection;
+                printf("Material boundary at (%f, %f, %f), same material: %d, remaining step: %.50f \n", initialPos.x, initialPos.y, initialPos.z, material, step);
             } else {
                 material = mat;
-                s = sampleFreePath(c_materials[material].sigma_t, state);
+                step = sampleFreePath(c_materials[material].sigma_t, state);
+                printf("Material change at (%f, %f, %f), new material: %d\n", initialPos.x, initialPos.y, initialPos.z, material);
             }
         }
 
+        return true;
+
         // TODO: handle absorption if boundaries are absorbing
     } else {
+        float xi = curand_uniform(state);
+        float p_abs = c_materials[material].sigma_a / c_materials[material].sigma_t;
+        printf("xi: %f, p_abs: %f\n", xi, p_abs);
+        if (xi < p_abs) return false; // Particle is absorbed 
     
-        // Prima la particella avanza della distanza s vecchia rimasta
-        r = r + d * s;
-    
-        // Dopo viene campionato il nuovo step per il prossimo ciclo
-        s = sampleFreePath(c_materials[material].sigma_t, state);
-    
-        // Campionamento nuova direzione di scattering
-        d = getRandomDirection(state);
+        initialPos = initialPos + dir * step;
+        step = sampleFreePath(c_materials[material].sigma_t, state);
+        dir = getRandomDirection(state);
+        return true;
     }
 }
 #endif // PREP_NEXT_ITER_CUH

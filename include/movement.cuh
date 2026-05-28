@@ -52,8 +52,8 @@ inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir)
     for (int i = 0; i < c_num_regions; ++i) {
         Region r = c_regions[i];
         
-        float3 box_min = make_float3((float)r.min_ix, (float)r.min_iy, (float)r.min_iz);
-        float3 box_max = make_float3((float)r.max_ix, (float)r.max_iy, (float)r.max_iz);
+        float3 box_min = make_float3((float)r.min_x, (float)r.min_y, (float)r.min_z);
+        float3 box_max = make_float3((float)r.max_x, (float)r.max_y, (float)r.max_z);
 
         float dist = intersectAABB(pos, inv_dir, box_min, box_max);
         if (dist > 0.0f && dist < closest_dist) {

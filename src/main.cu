@@ -29,21 +29,20 @@ int main() {
 	Material h_materials[4];
     Region h_regions[numRegions];
 
-    h_regions[0] = {0.2f, 0.8f, 0.2f, 0.8f, 0.2f, 0.8f, 1}; // L'Acqua riempie la zona da -5 a +5 (ID 1)
-    h_regions[1] = {0.3f, 0.7f, 0.3f, 0.7f, 0.3f, 0.7f, 2}; // L'Uranio sta al centro da -1 a +1 (ID 2)
-    h_regions[2] = {0.4f, 0.5f, 0.4f, 0.5f, 0.4f, 0.5f, 3}; // L'Uranio sta al centro da -1 a +1 (ID 2)
+    h_regions[0] = {0.2f, 0.8f, 0.2f, 0.8f, 0.2f, 0.8f, 1};
+    h_regions[1] = {0.3f, 0.7f, 0.3f, 0.7f, 0.3f, 0.7f, 2};
+    h_regions[2] = {0.4f, 0.5f, 0.4f, 0.5f, 0.4f, 0.5f, 1};
 
-    h_materials[0] = {0.1f, 0.1f, 0.20f};  // Vuoto (ID 0)
-    h_materials[1] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)
-    h_materials[2] = {0.2f, 0.8f, 1.00f};  // Uranio (ID 2)
-    h_materials[3] = {0.1f, 0.05f, 0.15f}; // Acqua (ID 1)
+    h_materials[0] = {0.1f, 0.1f, 0.20f};
+    h_materials[1] = {0.1f, 0.05f, 0.15f};
+    h_materials[2] = {0.2f, 0.8f, 1.00f};
 
     // Copia su GPU
     std::cout << "Copying data to GPU..." << std::endl;
     cudaMemcpyToSymbol(c_regions, h_regions, numRegions * sizeof(Region));
     cudaMemcpyToSymbol(c_materials, h_materials, 3 * sizeof(Material));
     cudaMemcpyToSymbol(c_num_regions, &numRegions, sizeof(int));
-    int N = 1000;
+    int N = 1;
     const int blockSize = 512;
     const int numBlocks = (N + blockSize - 1) / blockSize;
 
@@ -76,7 +75,7 @@ int main() {
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
-    uint edgeN = 100;
+    uint edgeN = 10;
     uint gridSize = edgeN * edgeN * edgeN;
     double voxelSize = 1.0 / edgeN;
 
@@ -89,7 +88,7 @@ int main() {
 
     int particelle_vive = N;
     int iterazione = 0;
-    const int max_iter = 100000;
+    const int max_iter = 100;
 
     std::cout << "Starting transport cycle..." << std::endl;
     while (particelle_vive > 0 && iterazione < max_iter) {

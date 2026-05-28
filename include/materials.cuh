@@ -34,9 +34,9 @@ __device__ inline u_int8_t getMaterialID(float3 pos) {
 	
 	for ( int i=0; i<c_num_regions; i++) {
 		Region r = c_regions[i];
-		int inside = (pos.x >= r.min_ix) * (pos.x <= r.max_ix) *
-			     (pos.y >= r.min_iy) * (pos.y <= r.max_iy) *
-			     (pos.z >= r.min_iz) * (pos.z <= r.max_iz);
+		int inside = (pos.x >= r.min_x) * (pos.x <= r.max_x) *
+			     (pos.y >= r.min_y) * (pos.y <= r.max_y) *
+			     (pos.z >= r.min_z) * (pos.z <= r.max_z);
 		final_mat_id = (inside * r.mat_id) + ((1 - inside) * final_mat_id);
 	}
 	return final_mat_id;
