@@ -25,7 +25,7 @@ __global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, f
     u_int8_t matID = getMaterialID(pos);
 
 
-    alive[real_id] = prepNextIter(pos + dir * min_step, s, pos, dir, matID, &randState[real_id]);
+    alive[real_id] = prepNextIter(distance, s, pos, dir, matID, &randState[real_id]);
     posx[real_id] = pos.x;
     posy[real_id] = pos.y;
     posz[real_id] = pos.z;

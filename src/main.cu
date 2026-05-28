@@ -42,7 +42,7 @@ int main() {
     cudaMemcpyToSymbol(c_regions, h_regions, numRegions * sizeof(Region));
     cudaMemcpyToSymbol(c_materials, h_materials, 3 * sizeof(Material));
     cudaMemcpyToSymbol(c_num_regions, &numRegions, sizeof(int));
-    int N = 1;
+    int N = 1000000;
     const int blockSize = 512;
     const int numBlocks = (N + blockSize - 1) / blockSize;
 
@@ -75,7 +75,7 @@ int main() {
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
-    uint edgeN = 10;
+    uint edgeN = 100;
     uint gridSize = edgeN * edgeN * edgeN;
     double voxelSize = 1.0 / edgeN;
 
@@ -88,7 +88,7 @@ int main() {
 
     int particelle_vive = N;
     int iterazione = 0;
-    const int max_iter = 100;
+    const int max_iter = 1000;
 
     std::cout << "Starting transport cycle..." << std::endl;
     while (particelle_vive > 0 && iterazione < max_iter) {
