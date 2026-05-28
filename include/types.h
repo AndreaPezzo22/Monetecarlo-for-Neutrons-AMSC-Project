@@ -9,9 +9,9 @@ struct Material {
 
 // Aggiunto Struct Region per definire le posizioni dei materiali 
 struct Region {
-	float min_ix, max_ix;
-	float min_iy, max_iy;
-	float min_iz, max_iz;
+	float min_x, max_x;
+	float min_y, max_y;
+	float min_z, max_z;
 	u_int8_t mat_id;
 };
 
