@@ -29,6 +29,8 @@
 
 extern __constant__ Material c_materials[10];
 
+const int BOUNDARY_TYPE_REFLECTIVE = 0;
+
 inline __device__ bool prepNextIter(const float distanceToIntersection,
                                    float &step,
                                    float3 &particlePos,
@@ -47,12 +49,14 @@ inline __device__ bool prepNextIter(const float distanceToIntersection,
         const bool hitZ = nextPos.z < 0.0f || nextPos.z > 1.0f;
 
         if (hitX || hitY || hitZ) {
-            particlePos -= dir * epsilon; // Move back slightly to avoid sticking to the boundary
-            if (hitX) dir.x = -dir.x;
-            if (hitY) dir.y = -dir.y;
-            if (hitZ) dir.z = -dir.z;
-            step -= distanceToIntersection;
-            // printf("Boundary hit at (%f, %f, %f), new direction: (%f, %f, %f)\n", particlePos.x, particlePos.y, particlePos.z, dir.x, dir.y, dir.z);
+            if(BOUNDARY_TYPE_REFLECTIVE){
+                particlePos -= dir * epsilon; // Move back slightly to avoid sticking to the boundary
+                if (hitX) dir.x = -dir.x;
+                if (hitY) dir.y = -dir.y;
+                if (hitZ) dir.z = -dir.z;
+                step -= distanceToIntersection;
+            } else return false; 
+
         } else {
             // Case 2: particle is not at a boundary but is changing material.
             // We update the material.
@@ -61,6 +65,9 @@ inline __device__ bool prepNextIter(const float distanceToIntersection,
             if (material == next_mat) {
                 step -= (distanceToIntersection + epsilon); 
                 // printf("Material boundary at (%f, %f, %f), same material: %d, remaining step: %.50f \n", particlePos.x, particlePos.y, particlePos.z, material, step);
+                // if(step <= 0){
+                //     printf("Step < 0 : %f\n", step);
+                // }; // To avoid negative step due to floating point precision issues
             } else {
                 material = next_mat;
                 step = sampleFreePath(c_materials[material].sigma_t, state);

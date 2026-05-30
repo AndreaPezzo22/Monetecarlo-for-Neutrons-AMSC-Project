@@ -17,6 +17,7 @@
 #define INIT_CUH
 
 #include <curand_kernel.h>
+
 #include "utils.h"
 #include "types.h"
 #include "materials.cuh"
@@ -25,28 +26,35 @@
 
 extern __constant__ Material c_materials[10];
 
-__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, curandState* randState, int N, unsigned long long seed) {
+__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, curandState* randState, int N, unsigned long long seed, Region source) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= N) return;
 
     // Initialize the random state for each particle
     curand_init(seed, id, 0, &randState[id]);
 
-    curandState *state = &randState[id];
-    // Set initial random positions (for example, within a unit cube)
-    float3 pos = make_float3(curand_uniform(state), curand_uniform(state), curand_uniform(state));
-    posx[id] = pos.x;
-    posy[id] = pos.y;
-    posz[id] = pos.z;
+    // Set local copy of the random state to avoid multiple accesses to global memory
+    curandState localeState = randState[id];
 
-    float3 dir = getRandomDirection(state);
+    // Set initial random positions inside source bounds 
+    float px = source.min_x + curand_uniform(&localeState) * (source.max_x - source.min_x);
+    float py = source.min_y + curand_uniform(&localeState) * (source.max_y - source.min_y);
+    float pz = source.min_z + curand_uniform(&localeState) * (source.max_z - source.min_z);
+
+    posx[id] = px;
+    posy[id] = py;
+    posz[id] = pz;
+
+    float3 pos = make_float3(px, py, pz);
+    float3 dir = getRandomDirection(&localeState);
+
     dirx[id] = dir.x;
     diry[id] = dir.y;
     dirz[id] = dir.z;
 
     u_int8_t matID = getMaterialID(pos);
-    step[id] = sampleFreePath(c_materials[matID].sigma_t, &randState[id]);
-
+    step[id] = sampleFreePath(c_materials[matID].sigma_t, &localeState);
+    randState[id] = localeState; 
 }
 
 #endif // INIT_CUH

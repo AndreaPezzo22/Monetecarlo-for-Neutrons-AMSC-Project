@@ -39,6 +39,7 @@ __device__ inline u_int8_t getMaterialID(float3 pos) {
 			     (pos.z >= r.min_z) * (pos.z <= r.max_z);
 		final_mat_id = (inside * r.mat_id) + ((1 - inside) * final_mat_id);
 	}
+	// printf("Position: (%.2f, %.2f, %.2f) -> Material ID: %d\n", pos.x, pos.y, pos.z, final_mat_id);
 	return final_mat_id;
 }
 	

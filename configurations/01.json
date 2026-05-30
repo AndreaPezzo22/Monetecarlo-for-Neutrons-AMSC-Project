@@ -1,0 +1,9 @@
+{
+  "numParticles": 10000000,
+  "numGridIntervals": 100, 
+  "source": { "min_x": -25.0, "max_x": -23.0, "min_y": -2.0, "max_y": 2.0, "min_z": -2.0, "max_z": 2.0},
+  "default": "graphite",
+  "regions": [
+    { "min_x": 0.0, "max_x": 25.0, "min_y": -25.0, "max_y": 25.0, "min_z": -25.0, "max_z": 25.0, "material_name": "concrete" }
+  ]
+}

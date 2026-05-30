@@ -3,9 +3,12 @@
 
 // Firme delle funzioni di utilità C++ (lettura file, statistiche)
 #include <curand_kernel.h>
-#include "math_constants.h"
 #include <fstream>
 #include <iostream>
+#include <vector>
+
+#include "math_constants.h"
+#include "types.h"
 
 inline __device__ float3 getRandomDirection(curandState *state) {
     // curand_uniform returns a random float in the range (0.0, 1.0]
@@ -49,6 +52,6 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-void save_to_vtk(const char *filename, const double* grid, const uint edgeN, const double voxelSize);
+void save_to_vtk(const char *filename, const double* grid, const std::vector<Region> regions, const uint edgeN, const double voxelSize);
 
 #endif // UTILS_H

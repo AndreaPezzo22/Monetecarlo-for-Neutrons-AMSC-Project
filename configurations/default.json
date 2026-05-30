@@ -1,0 +1,10 @@
+{
+  "numParticles": 10000000,
+  "numGridIntervals": 100, 
+  "source": { "min_x": -0.5, "max_x": 0.5, "min_y": -0.5, "max_y": 0.5, "min_z": -0.5, "max_z": 0.5},
+  "default": "vacuum",
+  "regions": [
+    { "min_x": -3.0, "max_x": 0.0, "min_y": -3.0, "max_y": 3.0, "min_z": -3.0, "max_z": 3.0, "material_name": "boron" },
+    { "min_x": 0.0, "max_x": 3.0, "min_y": -3.0, "max_y": 3.0, "min_z": -3.0, "max_z": 3.0, "material_name": "graphite" }
+  ]
+}

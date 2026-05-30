@@ -13,7 +13,7 @@ NVCC_FLAGS = -O3 -rdc=true -arch=sm_80 -Iinclude
 # CUDA source files
 CU_SRCS = src/main.cu
 # C++ source files
-CPP_SRCS = src/utils.cpp
+CPP_SRCS = src/utils.cpp src/Domain.cpp
 
 CU_OBJS = $(CU_SRCS:.cu=.o)
 CPP_OBJS = $(CPP_SRCS:.cpp=.o)

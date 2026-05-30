@@ -19,17 +19,16 @@ Domain::Domain() {
 }
 
 // File parsing constructor
+// File parsing constructor
 Domain::Domain(const std::string& filepath) {
     // Open and parse the main configuration file and materials file
     std::string full_path = filepath;
 
-    // Append .json if it doesn't already end with it
     std::string ext = ".json";
     if (full_path.length() < ext.length() || 
         full_path.compare(full_path.length() - ext.length(), ext.length(), ext) != 0) {
         full_path += ext;
     }
-    // Prepend configurations/ if it doesn't already start with it
     std::string dir = "configurations/";
     if (full_path.find(dir) != 0) {
         full_path = dir + full_path;
@@ -39,53 +38,82 @@ Domain::Domain(const std::string& filepath) {
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open domain file: " + full_path);
     }
-    json config = json::parse(file);
+    
+    json config;
+    try {
+        config = json::parse(file);
+    } catch (const std::exception& e) {
+        throw std::runtime_error("JSON parse error in " + full_path + ": " + e.what());
+    }
+    std::cout << "Successfully parsed domain configuration from " << full_path << std::endl;
 
     std::ifstream mat_file("configurations/materials.json");
     if (!mat_file.is_open()) {
         throw std::runtime_error("Failed to open configuration/materials.json");
     }
-    json mat_config = json::parse(mat_file);
+
+    json mat_config;
+    try {
+        mat_config = json::parse(mat_file);
+    } catch (const std::exception& e) {
+        throw std::runtime_error("JSON parse error in materials.json: " + std::string(e.what()));
+    }
 
     // ------------------------------------------------------------------------------
     // Extract integer parameters
-    numParticles = config["numParticles"].get<int>();
-    numGridIntervals = config["numGridIntervals"].get<int>();
+    try {
+        numParticles = config.at("numParticles").get<int>();
+        numGridIntervals = config.at("numGridIntervals").get<int>();
 
-    // Extract Source
-    json& source_json = config["source"];
-    source.min_x = source_json["min_x"].get<float>(); 
-    source.max_x = source_json["max_x"].get<float>();
-    source.min_y = source_json["min_y"].get<float>();
-    source.max_y = source_json["max_y"].get<float>();
-    source.min_z = source_json["min_z"].get<float>();
-    source.max_z = source_json["max_z"].get<float>(); 
+        // Extract Source
+        const json& source_json = config.at("source");
+        source.min_x = source_json.at("min_x").get<float>(); 
+        source.max_x = source_json.at("max_x").get<float>();
+        source.min_y = source_json.at("min_y").get<float>();
+        source.max_y = source_json.at("max_y").get<float>();
+        source.min_z = source_json.at("min_z").get<float>();
+        source.max_z = source_json.at("max_z").get<float>(); 
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error reading base parameters or source configuration: " + std::string(e.what()));
+    }
 
     // Extract Default material and add it to the materials list 
-    std::string default_material = config["default"].get<std::string>();
+    std::string default_material;
+    try {
+        default_material = config.at("default").get<std::string>();
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error reading 'default' material string: " + std::string(e.what()));
+    }
 
     // ------------------------------------------------------------------------------
-    // Find default material in materials.json and add it to the materials list, also keep track of material names to be added from regions
+    // Find default material in materials.json and add it to the materials list
     std::vector<std::string> material_names;
-
     int mat_index = 0;
+
     if(!mat_config.contains(default_material)) {
         throw std::runtime_error("Default material '" + default_material + "' not found in configurations/materials.json");
     } else {
-        json& mat_json = mat_config[default_material];
-        Material m;
-        m.sigma_s = mat_json["sigma_s"].get<float>();
-        m.sigma_a = mat_json["sigma_a"].get<float>();
-        m.sigma_t = mat_json["sigma_t"].get<float>();
-        materials.push_back(m);
-        material_names.push_back(default_material);
-        ++mat_index;
+        try {
+            const json& mat_json = mat_config.at(default_material);
+            Material m;
+            m.sigma_s = mat_json.at("sigma_s").get<float>();
+            m.sigma_a = mat_json.at("sigma_a").get<float>();
+            m.sigma_t = mat_json.at("sigma_t").get<float>();
+            materials.push_back(m);
+            material_names.push_back(default_material);
+            ++mat_index;
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Error reading properties for default material '" + default_material + "': " + e.what());
+        }
     }
 
     // ------------------------------------------------------------------------------
     // Extract Regions
-    json& regions_json = config["regions"];
-    // Track global min/max for each axis to determine the domain size
+    if (!config.contains("regions")) {
+        throw std::runtime_error("Missing 'regions' array in domain configuration.");
+    }
+    
+    const json& regions_json = config.at("regions");
     float global_min_x = std::numeric_limits<float>::infinity();
     float global_max_x = -std::numeric_limits<float>::infinity();
     float global_min_y = std::numeric_limits<float>::infinity();
@@ -98,70 +126,75 @@ Domain::Domain(const std::string& filepath) {
         if (reg_index >= MAX_REGIONS-1) {
             throw std::runtime_error("Exceeded maximum number of regions (20)");
         }
-        // Extract region bounds and material name
-        float min_x = reg_json["min_x"].get<float>();
-        float max_x = reg_json["max_x"].get<float>();
-        float min_y = reg_json["min_y"].get<float>();
-        float max_y = reg_json["max_y"].get<float>();
-        float min_z = reg_json["min_z"].get<float>();
-        float max_z = reg_json["max_z"].get<float>();
-        std::string mat_name = reg_json["material_name"].get<std::string>();
+        
+        Region r;
+        std::string mat_name;
+        try {
+            r.min_x = reg_json.at("min_x").get<float>();
+            r.max_x = reg_json.at("max_x").get<float>();
+            r.min_y = reg_json.at("min_y").get<float>();
+            r.max_y = reg_json.at("max_y").get<float>();
+            r.min_z = reg_json.at("min_z").get<float>();
+            r.max_z = reg_json.at("max_z").get<float>();
+            mat_name = reg_json.at("material_name").get<std::string>();
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Error reading bounds or material_name for region index " + std::to_string(reg_index) + ": " + e.what());
+        }
 
-        // Search for the material vector, if not found returns material_names.end()
         auto it = std::find(material_names.begin(), material_names.end(), mat_name);
 
-        Region r;
-        r.min_x = min_x;
-        r.max_x = max_x;
-        r.min_y = min_y;
-        r.max_y = max_y;
-        r.min_z = min_z;
-        r.max_z = max_z;
         if(!mat_config.contains(mat_name)) {
             throw std::runtime_error("Material '" + mat_name + "' not found in configurations/materials.json");
         } else if(it != material_names.end()) {
-            // Material already exists, use its index
             r.mat_id = std::distance(material_names.begin(), it);
         } else {
             if(mat_index >= MAX_MATERIALS) {
                 throw std::runtime_error("Exceeded maximum number of materials (10)");
             }
-            json& mat_json = mat_config[mat_name];
-            Material m;
-            m.sigma_s = mat_json["sigma_s"].get<float>();
-            m.sigma_a = mat_json["sigma_a"].get<float>();
-            m.sigma_t = mat_json["sigma_t"].get<float>();
-            materials.push_back(m);
-            material_names.push_back(mat_name);
-            r.mat_id = mat_index; // Store the index of the material in current region
-            ++mat_index;
+            try {
+                const json& mat_json = mat_config.at(mat_name);
+                Material m;
+                m.sigma_s = mat_json.at("sigma_s").get<float>();
+                m.sigma_a = mat_json.at("sigma_a").get<float>();
+                m.sigma_t = mat_json.at("sigma_t").get<float>();
+                materials.push_back(m);
+                material_names.push_back(mat_name);
+                r.mat_id = mat_index; 
+                ++mat_index;
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Error reading properties for material '" + mat_name + "': " + e.what());
+            }
         }
         regions.push_back(r);
         
-        // Check if the region represent an extreme of the domain and update global min/max accordingly
-        global_min_x = std::min(global_min_x, min_x);
-        global_max_x = std::max(global_max_x, max_x);
-        global_min_y = std::min(global_min_y, min_y);
-        global_max_y = std::max(global_max_y, max_y);
-        global_min_z = std::min(global_min_z, min_z);
-        global_max_z = std::max(global_max_z, max_z);
+        global_min_x = std::min(global_min_x, r.min_x);
+        global_max_x = std::max(global_max_x, r.max_x);
+        global_min_y = std::min(global_min_y, r.min_y);
+        global_max_y = std::max(global_max_y, r.max_y);
+        global_min_z = std::min(global_min_z, r.min_z);
+        global_max_z = std::max(global_max_z, r.max_z);
 
         ++reg_index;
     }
+    // Source Region could be outside of defined regions, so we also consider it for global bounds
+    global_min_x = std::min(global_min_x, source.min_x);
+    global_max_x = std::max(global_max_x, source.max_x);
+    global_min_y = std::min(global_min_y, source.min_y);
+    global_max_y = std::max(global_max_y, source.max_y);
+    global_min_z = std::min(global_min_z, source.min_z);
+    global_max_z = std::max(global_max_z, source.max_z);
+
     // Calculate the spans for each axis
     float span_x = global_max_x - global_min_x;
     float span_y = global_max_y - global_min_y;
     float span_z = global_max_z - global_min_z;
-    // Find the maximum span across all axes
     max_span = std::max({span_x, span_y, span_z});
-    // Save the offsets for all axis to map the regions to the normalized unit cube later
     offset_x = global_min_x;
     offset_y = global_min_y;
     offset_z = global_min_z;
 
     // ------------------------------------------------------------------------------
     // Normalize region bounds to fit within a unit cube [0,1]^3
-    // Source
     source.min_x = (source.min_x - offset_x) / max_span;
     source.max_x = (source.max_x - offset_x) / max_span;
     source.min_y = (source.min_y - offset_y) / max_span;
@@ -169,7 +202,6 @@ Domain::Domain(const std::string& filepath) {
     source.min_z = (source.min_z - offset_z) / max_span;
     source.max_z = (source.max_z - offset_z) / max_span;
 
-    // Regions
     for (auto& r : regions) {
         r.min_x = (r.min_x - offset_x) / max_span;
         r.max_x = (r.max_x - offset_x) / max_span;
@@ -178,14 +210,13 @@ Domain::Domain(const std::string& filepath) {
         r.min_z = (r.min_z - offset_z) / max_span;
         r.max_z = (r.max_z - offset_z) / max_span;
     }
-    // Cross Sections
+    
     for (auto& m : materials) {
         m.sigma_s *= max_span;
         m.sigma_a *= max_span;
         m.sigma_t *= max_span;
     }
 
-    // Add the default materials as a 1x1x1 region covering the entire domain
     Region default_region;
     default_region.min_x = 0.0f;
     default_region.max_x = 1.0f;
@@ -193,8 +224,8 @@ Domain::Domain(const std::string& filepath) {
     default_region.max_y = 1.0f;
     default_region.min_z = 0.0f;
     default_region.max_z = 1.0f;
-    default_region.mat_id = 0; // The default material is always at index 0
-    regions.insert(regions.begin(), default_region); // Insert at the beginning to ensure it has the lowest priority
+    default_region.mat_id = 0; 
+    regions.insert(regions.begin(), default_region); 
 }
 
 void Domain::printSummaryNormalized() const {
