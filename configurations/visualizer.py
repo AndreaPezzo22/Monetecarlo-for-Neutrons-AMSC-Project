@@ -86,12 +86,28 @@ def main():
         draw_box(ax, region['min_x'], region['max_x'], region['min_y'], region['max_y'], 
                  region['min_z'], region['max_z'], color=color, label=mat_name, seen_labels=seen_labels)
 
-    # Enforce fixed/equal aspect ratio in 3D
+    # Enforce strict 1:1:1 aspect ratio by squaring the axis limits
     if bounds['x']:
-        dx = max(bounds['x']) - min(bounds['x'])
-        dy = max(bounds['y']) - min(bounds['y'])
-        dz = max(bounds['z']) - min(bounds['z'])
-        ax.set_box_aspect((dx, dy, dz))
+        x_min, x_max = min(bounds['x']), max(bounds['x'])
+        y_min, y_max = min(bounds['y']), max(bounds['y'])
+        z_min, z_max = min(bounds['z']), max(bounds['z'])
+        
+        # Find the midpoints of each axis
+        mid_x = (x_max + x_min) / 2.0
+        mid_y = (y_max + y_min) / 2.0
+        mid_z = (z_max + z_min) / 2.0
+        
+        # Find the maximum range among all 3 axes
+        max_range = max(x_max - x_min, y_max - y_min, z_max - z_min)
+        
+        # Set all axes to the exact same range size, centered on their midpoints
+        half_range = max_range / 2.0
+        ax.set_xlim(mid_x - half_range, mid_x + half_range)
+        ax.set_ylim(mid_y - half_range, mid_y + half_range)
+        ax.set_zlim(mid_z - half_range, mid_z + half_range)
+        
+        # Force the physical drawing box to be a perfect cube
+        ax.set_box_aspect([1, 1, 1])
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
