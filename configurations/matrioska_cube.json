@@ -1,0 +1,14 @@
+{
+  "numParticles": 10000000,
+  "numGridIntervals": 120,
+  "source": { "min_x": 48.0, "max_x": 52.0, "min_y": 48.0, "max_y": 52.0, "min_z": 48.0, "max_z": 52.0 },
+  "default": "vacuum",
+  "regions": [
+    { "min_x": 60.0, "max_x": 100.0, "min_y": 0.0, "max_y": 100.0, "min_z": 0.0, "max_z": 100.0, "material_name": "graphite" },
+    { "min_x": 0.0, "max_x": 40.0, "min_y": 0.0, "max_y": 100.0, "min_z": 0.0, "max_z": 100.0, "material_name": "graphite" },
+    { "min_x": 40.0, "max_x": 60.0, "min_y": 60.0, "max_y": 100.0, "min_z": 0.0, "max_z": 100.0, "material_name": "graphite" },
+    { "min_x": 40.0, "max_x": 60.0, "min_y": 0.0, "max_y": 40.0, "min_z": 0.0, "max_z": 100.0, "material_name": "graphite" },
+    { "min_x": 40.0, "max_x": 60.0, "min_y": 40.0, "max_y": 60.0, "min_z": 60.0, "max_z": 100.0, "material_name": "graphite" },
+    { "min_x": 40.0, "max_x": 60.0, "min_y": 40.0, "max_y": 60.0, "min_z": 0.0, "max_z": 40.0, "material_name": "graphite" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "numParticles": 10000000,
+  "numGridIntervals": 100,
+  "source": { "min_x": 0.0, "max_x": 10.0, "min_y": 40.0, "max_y": 60.0, "min_z": 40.0, "max_z": 60.0 },
+  "default": "vacuum",
+  "regions": [
+    { "min_x": 10.0, "max_x": 90.0, "min_y": 52.0, "max_y": 70.0, "min_z": 30.0, "max_z": 70.0, "material_name": "cadmium" },
+    { "min_x": 10.0, "max_x": 90.0, "min_y": 30.0, "max_y": 48.0, "min_z": 30.0, "max_z": 70.0, "material_name": "cadmium" },
+    { "min_x": 10.0, "max_x": 90.0, "min_y": 48.0, "max_y": 52.0, "min_z": 30.0, "max_z": 48.0, "material_name": "cadmium" },
+    { "min_x": 10.0, "max_x": 90.0, "min_y": 48.0, "max_y": 52.0, "min_z": 52.0, "max_z": 70.0, "material_name": "cadmium" }
+  ]
+}

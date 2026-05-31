@@ -1,0 +1,11 @@
+{
+  "numParticles": 10000000,
+  "numGridIntervals": 150,
+  "source": { "min_x": 5.0, "max_x": 15.0, "min_y": 45.0, "max_y": 55.0, "min_z": 5.0, "max_z": 15.0 },
+  "default": "vacuum",
+  "regions": [
+    { "min_x": 0.0, "max_x": 60.0, "min_y": 60.0, "max_y": 100.0, "min_z": 0.0, "max_z": 20.0, "material_name": "concrete" },
+    { "min_x": 0.0, "max_x": 40.0, "min_y": 0.0, "max_y": 40.0, "min_z": 0.0, "max_z": 20.0, "material_name": "concrete" },
+    { "min_x": 60.0, "max_x": 100.0, "min_y": 0.0, "max_y": 100.0, "min_z": 0.0, "max_z": 20.0, "material_name": "concrete" }
+  ]
+}
