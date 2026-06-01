@@ -5,18 +5,18 @@ The program tracks the trajectory of a large number of particles within a custom
 
 ## 🔬 State of the Art
 
-The Monte Carlo simulation is used in those practical applications, where it is too complex to allow direct numerical solutions of the transport equations. In this cases, one develops a statistical analogue description of a particle's life history on the computer, using random sampling methods. Then by running off a large number of such case histories, these results can be averaged to obtain estimates of the expected behavior of the particle population. Particle transport processes are quite amenable to such treatment, since the individual interaction events are usually described in terms of statistical characteristics. The application of Monte carlo methods to the direct simulation of particle requires to model the relevant physics of each particle interaction event as closely as possible. The essential idea is to trace out a number of neutron histories, using a table of random numbers to determine whether and what type of interactions occur along a neutron's flight.
+Monte Carlo simulations are used to numerically approximate quantities of interest by simulating a high number of independent and identically distributed (i.i.d.) events and averaging the outcomes. Particle transport processes are highly amenable to this approach, as individual particle histories can often be considered independent. The idea is to trace out a number of neutron histories, simulating the interactions that occur along a neutron's flight path, while keeping track of the flux contribution of individual particles.
 
-This project implements a particle transport code based on the Monte Carlo method, designed to simulate the path of neutrons within a three-dimensional domain containing regions of different materials.  
+This project simulates particle transport within a three-dimensional domain containing regions of different materials.
 
-Transport physics is governed by the macroscopic cross sections ($\Sigma_t$, $\Sigma_a$) of materials. The code iteratively performs the following steps to simulate the particle lifecycle:
-1. Initialization: Particles are injected into the domain with a random initial position (within the bounds of the source) and an isotropic starting direction.
-2. Material Detection: Each particle identifies the material of the region it is currently situated in.
-3. Path Sampling: A new free path length ($s$) is sampled using the exponential attenuation formula:
+Transport physics is governed by the macroscopic cross sections (Σt​, Σa​) of the materials. The code iteratively performs the following steps to simulate the particle lifecycle:
+1.  Initialization: Particles are injected into the domain with a random initial position (within the bounds of the source) and an isotropic starting direction. Furthermore, a free path length $s$ is sampled using the exponential attenuation formula:
 $$s = -\frac{\ln(\xi)}{\Sigma_t}$$
-4. Tracking & Flux Estimation: The particle advances by the sampled path length or stops at the nearest geometric boundary. During this displacement, the scalar flux ($\Phi$) is estimated on the 3D grid using the Track Length Estimator method, which atomically accumulates the length of the track segment left by the particle in each voxel.
-5. Collision & Boundary Handling: Once the particle finishes its step, the code decides its fate. If a collision occurs, it evaluates whether the particle scatters or gets absorbed based on the absorption probability $p_{abs} = \frac{\Sigma_a}{\Sigma_t}$. If it hits a region boundary, the material is updated for the next iteration.
+where $\sigma_t$​ depends on the material into which the particle is injected.
 
+2. Tracking & Flux Estimation: The particle advances by the sampled path length or stops at the nearest geometric boundary. During this displacement, the scalar flux is estimated on the 3D grid using the Track Length Estimator method, which accumulates the length of the track segment left by the particle in each voxel.
+
+3. Collision & Boundary Handling: If a collision occurs during step 2, the particle either scatters or is absorbed based on the absorption probability $\frac{\Sigma_a}{\Sigma_t}$​​. In the event of scattering, a new free path is sampled. If the particle hits a region boundary, the remaining path sampled in the previous step is reduced by the distance already traveled.
 
 ---
 
