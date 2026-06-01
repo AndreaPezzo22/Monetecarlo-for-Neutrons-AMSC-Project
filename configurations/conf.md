@@ -1,36 +1,35 @@
-# Descrizione esperimenti
+# Experiment Descriptions
 
-## 1. Esperimento: Parete Multistrato (Radioprotezione Standard)
+## 1. Experiment: multilayered_wall
 
-Questo esperimento simula la classica configurazione di scudi protettivi utilizzati nei laboratori nucleari. L'obiettivo è bloccare un fascio direzionale di neutroni sfruttando tre materiali con proprietà fisiche complementari.
+This experiment simulates the classic configuration of protective shields used in nuclear laboratories. The goal is to block a directional neutron beam by utilizing three materials with complementary physical properties [1].
 
-- **Dinamica Fisica:** Il neutrone incontra prima uno spesso blocco di **Ferro**, il cui scopo è abbattere l'energia cinetica dei neutroni più veloci tramite duri urti inelastici. Successivamente entra nell'**Acqua** (il moderatore per eccellenza), dove le collisioni con i nuclei di idrogeno rallentano la particella fino a energie termiche. Infine, i neutroni ormai lenti sbattono contro il **Boro**, che possiede una sezione d'urto di assorbimento altissima e agisce da "spugna" finale.
-- **Cosa testa nel vostro codice:** Verifica l'accuratezza del tracciamento lungo una linea prevalentemente retta e, soprattutto, che le probabilità di interazione (sezioni d'urto) vengano applicate correttamente nel giusto ordine geometrico.
+The neutron first encounters a thick block of **Iron**, whose purpose is to reduce the kinetic energy of the fastest neutrons through hard inelastic collisions. It then enters **Water** (the moderator par excellence), where collisions with hydrogen nuclei slow the particle down to thermal energies. Finally, the now-slow neutrons strike **Boron**, which has a very high absorption cross-section and acts as a final “sponge.”
 
-## 2. Esperimento: Cubo Moderatore a "Matrioska" (Isotropia e Termalizzazione)
+## 2. Esperimento: matrioska_cube"
 
-Questa geometria è il fondamento dell'Analisi per Attivazione Neutronica (NAA). Simula una sorgente puntiforme immersa al centro di un massiccio moderatore solido per creare una "nube" di neutroni termici.
+Simulate a point source embedded in the center of a massive solid moderator.
 
-- **Dinamica Fisica:** La particella nasce nel vuoto e viaggia indisturbata finché non colpisce le pareti interne della camera in **Grafite**. Da quel momento, inizia un percorso a zig-zag casuale tridimensionale (random walk), perdendo una frazione di energia a ogni rimbalzo. Non essendoci materiali assorbenti, il neutrone continua a deviare finché non esce dai bordi esterni del sistema o non viene ucciso dal limite massimo di step della simulazione.
-- **Cosa testa nel vostro codice:** È il collaudo perfetto per la vostra matematica di generazione degli angoli di scattering 3D. Se l'isotropia del codice è corretta, la distribuzione spaziale dei neutroni all'interno della grafite dovrà risultare perfettamente sferica.
+The simulated physical dynamics predict that the neutrons will travel through the initial vacuum without interacting, and then collide with the graphite walls—which are forty units thick—where, due to the high scattering cross section and the very low absorption of carbon, they will begin a process of three-dimensional random diffusion.   
 
-## 3. Esperimento: Labirinto di Streaming (Dispersione nei Bunker)
+## 3. Experiment: maze
 
-Una geometria progettata per calcolare le fughe parassite di radiazioni ("streaming") lungo i corridoi degli acceleratori o delle sale di radioterapia. I neutroni non amano le linee rette; questo esperimento testa se riescono a "svoltare l'angolo".
+A geometry designed to calculate parasitic radiation streaming along the corridors of accelerators or radiation therapy rooms. Neutrons don't like straight lines; this experiment tests whether they can “turn the corner” [2].
 
-- **Dinamica Fisica:** I neutroni vengono sparati in un tunnel a forma di "L". Le pareti in **Calcestruzzo** tendono ad assorbire la maggior parte delle particelle, ma una percentuale rimbalza sulle pareti (effetto albedo). Solo i neutroni che subiscono la sequenza geometricamente perfetta di rimbalzi riescono a superare la curva e raggiungere l'uscita.
-- **Cosa testa nel vostro codice:** Mette alla prova la robustezza del codice nelle geometrie con vuoti complessi e verifica se il motore gestisce correttamente le condizioni di perdita di particelle (leakage) dai bordi aperti della geometria.
+Neutrons are fired into an “L”-shaped tunnel. The **concrete** walls tend to absorb most of the particles, but a percentage bounces off the walls. Only the neutrons that undergo the geometrically perfect sequence of bounces manage to navigate the curve and reach the exit.
 
-## 4. Esperimento: Collimatore a Fessura (Fascio ad Alta Precisione)
+## 4. Esperimento: slit_collimator
 
-Questo setup riproduce l'estrazione di un fascio neutronico da un reattore di ricerca, utilizzato per scansionare la struttura reticolare dei materiali (diffrazione neutronica).
+In this experiment, a microscopic vacuum tunnel is surrounded by **cadmium**. This material has highly absorptive properties, so only neutrons whose trajectory is parallel to the tunnel axis survive.
 
-- **Dinamica Fisica:** Un microscopico canale di vuoto lungo 40 cm è stretto in una morsa di spessi blocchi di **Cadmio**. Il cadmio è un "veleno" formidabile che fagocita immediatamente quasi ogni neutrone che lo tocca. Di conseguenza, solo i neutroni con una traiettoria millimetricamente parallela all'asse del tunnel sopravvivono.
-- **Cosa testa nel vostro codice:** È uno *stress test* per la precisione in virgola mobile (ray-casting rasente le superfici) e per il meccanismo di annichilazione del codice (sezione d'urto di assorbimento puro estrema).
+## 5. Experiment: kernel_pattern
 
-## 5. Esperimento: Reticolo del Nocciolo (Simulazione di Reattore)
+A miniature reproduction of the internal topology of the core of a pressurized water reactor, where the fuel and moderator are arranged in a checkerboard pattern.
 
-Una riproduzione in miniatura (su una griglia 3x3) della topologia interna del nocciolo di un reattore ad acqua pressurizzata, dove il combustibile e il moderatore sono disposti a scacchiera.
+Thin “bars” of **Uranium** are separated from one another by channels of **Water**. Neutrons are generated and travel continuously through the two materials: they undergo elastic scattering in the water and absorption in the uranium.
 
-- **Dinamica Fisica:** Sottili "barre" di **Uranio** sono separate tra loro da canali di **Acqua**. I neutroni nascono e viaggiano attraversando continuamente i due materiali: subiscono scattering elastico nell'acqua e assorbimento (che in una simulazione più avanzata innescherebbe una nuova fissione) nell'uranio.
-- **Cosa testa nel vostro codice:** Misura l'efficienza computazionale nuda e cruda della GPU. A causa delle dimensioni ridotte delle barre, le particelle cambiano regione e materiale decine di volte in pochissimi microsecondi, obbligando il kernel CUDA a risolvere un numero enorme di intersezioni (boundary crossings) in uno spazio densamente popolato.
+
+## References
+
+[1] Shultis, John & Faw, Richard. (2005). Radiation shielding technology. Health physics. 88. 587-612. 10.1097/01.HP.0000148615.73825.b1. 
+[2] Haghighat, Alireza & Sjoden, Glenn & Yi, Ce. (2009). Analysis and benchmarking of PENTRAN code using the OECD-NEA benchmark problems. 1. 

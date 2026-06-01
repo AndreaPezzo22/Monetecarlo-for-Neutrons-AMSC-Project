@@ -107,7 +107,7 @@ The simulator’s operation is driven by a series of specialized functions distr
   ./sim configurations/name_of_the_configuration   
   ```
 * **Experiment of the library**
-  Choose between one of the available experiments, a clear explanation is available [here](https://www.markdownguide.org).
+  Choose between one of the available experiments, a clear explanation is available [here](https://github.com/AndreaPezzo22/Montecarlo-for-Neutrons-AMSC-Project/blob/main/configurations/conf.md).
   ```bash 
   ./sim configurations/name_of_the_configuration
   ```
