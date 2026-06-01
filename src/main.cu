@@ -10,11 +10,25 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sequence.h>
 #include <thrust/fill.h>
+#include <chrono>
+
 
 struct is_alive {
     int* alive_array;
     __device__ bool operator()(const int& indice_particella) const {
         return alive_array[indice_particella] == 1;
+    }
+};
+
+// ── Functor: computes (x − μ)² for each element ───────────────────────────────
+struct SquaredDeviation {
+    double mean;
+    explicit SquaredDeviation(double m) : mean(m) {}
+
+    __host__ __device__
+    double operator()(double x) const {
+        double d = x - mean;
+        return d * d;
     }
 };
 
@@ -24,6 +38,7 @@ __constant__ int c_num_regions; // num regions
 
 int main(int argc, char* argv[]) {
     std::cout << "Starting simulation..." << std::endl;
+    auto t0 = std::chrono::steady_clock::now();
 
     // --------------------------------------------------------------------
     // SET DOMAIN from  file or default
@@ -49,6 +64,7 @@ int main(int argc, char* argv[]) {
     // ── Allocate unified memory (accessible on both CPU and GPU)
     std::cout << "Allocating memory..." << std::endl;
     float *posx, *posy, *posz, *dirx, *diry, *dirz, *step;
+    double* particle_flux;
     curandState* state;
     cudaMallocManaged(&posx, sizeof(float) * N);
     cudaMallocManaged(&posy, sizeof(float) * N);
@@ -57,6 +73,7 @@ int main(int argc, char* argv[]) {
     cudaMallocManaged(&diry, sizeof(float) * N);
     cudaMallocManaged(&dirz, sizeof(float) * N);
     cudaMallocManaged(&step, sizeof(float) * N);
+    cudaMallocManaged(&particle_flux, sizeof(double) * N);
     cudaMallocManaged(&state, sizeof(curandState) * N);
 
     // -- Allocate compaction arrays
@@ -71,7 +88,7 @@ int main(int argc, char* argv[]) {
     thrust::fill(thrust::device, alive, alive + N, 1); // Inizializza alive con 1 (tutti vivi)
 
     // Launch kernel with a valid block size and enough blocks for N threads
-    init<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, state, N, 42ULL, source);
+    init<<<numBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, particle_flux, state, N, 42ULL, source);
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
@@ -94,7 +111,7 @@ int main(int argc, char* argv[]) {
     while (particelle_vive > 0 && iterazione < max_iter) {
         int currentNumBlocks = (particelle_vive + blockSize - 1) / blockSize;
 
-        mainKernel<<<currentNumBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, N, grid, edgeN, voxelSize, state, active_indices, particelle_vive, alive);
+        mainKernel<<<currentNumBlocks, blockSize>>>(posx, posy, posz, dirx, diry, dirz, step, particle_flux, N, grid, edgeN, voxelSize, state, active_indices, particelle_vive, alive);
         CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
         CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
     
@@ -118,6 +135,43 @@ int main(int argc, char* argv[]) {
         particelle_vive = nuove_vive;
         iterazione++;
     }
+
+    CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
+    auto t1 = std::chrono::steady_clock::now();
+    double seconds = std::chrono::duration<double, std::milli>(t1 - t0).count() * 1e-3;
+
+    // --------------------------------------------------------------------
+    // ── Statistics: Compute mean and variance of particle flux
+
+    // Reduce sums all elements. The '0.0f' is the initial value.
+    thrust::device_ptr<double> begin(particle_flux);
+    thrust::device_ptr<double> end = begin + N;
+
+    double sum = thrust::reduce(begin, end, 0.0, thrust::plus<double>());
+    double mean = sum / N;
+
+    // --- COMPUTE VARIANCE ---
+    // transform_reduce applies the functor, then sums the results
+    double variance_sum = thrust::transform_reduce(
+        begin, 
+        end, 
+        SquaredDeviation(mean), 
+        0.0, 
+        thrust::plus<double>()
+    );
+    
+
+    // Divide by N for population variance (or N-1 for sample variance)
+    double variance = variance_sum / N;
+    double std_dev = std::sqrt(variance);
+    double relative_error = (std_dev / std::sqrt(N)) / mean;
+    std::cout << "Wall time: " << seconds << " s\n";
+
+    // Output results
+    std::cout << "Mean:             " << mean << "\n";
+    std::cout << "Std Dev:          " << std_dev << "\n";
+    std::cout << "Relative Error:   " << relative_error * 100.0 << " %\n"; // Assuming expected mean is 1.0 for demonstration
+    std::cout << "FOM:              " << 1 / (relative_error * seconds) << "\n";
 
     if (particelle_vive > 0) {
         std::cout << "Simulation ended after reaching the maximum number of iterations (" << max_iter << ")." << std::endl;

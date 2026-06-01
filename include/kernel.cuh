@@ -11,7 +11,7 @@
 
 
 
-__global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, const uint N, double* grid, const uint edgeN, const double voxelSize, curandState* randState, int* active_indices, const uint num_vive, int* alive) {
+__global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, double* particle_flux, const uint N, double* grid, const uint edgeN, const double voxelSize, curandState* randState, int* active_indices, const uint num_vive, int* alive) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= num_vive) return;
 
@@ -21,7 +21,7 @@ __global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, f
     float s = step[real_id];
     float distance = getDistanceToNearestIntersection(pos, dir);
     float min_step = fminf(s, distance);
-    flux(pos, pos + dir * min_step, grid, edgeN, voxelSize);
+    double flux_value = flux(pos, pos + dir * min_step, grid, edgeN, voxelSize);
     u_int8_t matID = getMaterialID(pos);
 
 
@@ -33,6 +33,7 @@ __global__ void mainKernel(float* posx, float* posy, float* posz, float* dirx, f
     diry[real_id] = dir.y;
     dirz[real_id] = dir.z;
     step[real_id] = s;
+    particle_flux[real_id] += flux_value;
 }
 
 #endif // MAIN_KERNEL_CUH

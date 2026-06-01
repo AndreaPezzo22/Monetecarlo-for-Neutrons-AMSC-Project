@@ -26,7 +26,7 @@
 
 extern __constant__ Material c_materials[10];
 
-__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, curandState* randState, int N, unsigned long long seed, Region source) {
+__global__ void init(float* posx, float* posy, float* posz, float* dirx, float* diry, float* dirz, float* step, double* particle_flux, curandState* randState, int N, unsigned long long seed, Region source) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id >= N) return;
 
@@ -51,7 +51,7 @@ __global__ void init(float* posx, float* posy, float* posz, float* dirx, float* 
     dirx[id] = dir.x;
     diry[id] = dir.y;
     dirz[id] = dir.z;
-
+    particle_flux[id] = 0.0;
     u_int8_t matID = getMaterialID(pos);
     step[id] = sampleFreePath(c_materials[matID].sigma_t, &localeState);
     randState[id] = localeState; 

@@ -32,11 +32,12 @@ inline __device__ int3 signOfDir(const float3 dir) {
     return make_int3(getsign(dir.x), getsign(dir.y), getsign(dir.z));
 }
 
-inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, double voxelSize) {
+inline __device__ double flux (float3 r0, float3 rf, double* grid, uint gridSize, double voxelSize) {
 
+    double particle_flux = 0.0;
     float tMax = length(rf - r0);
     if (tMax < 1e-7f) {
-        return; // Segmento nullo, usciamo senza fare calcoli
+        return particle_flux; // Segmento nullo, usciamo senza fare calcoli
     }
 
     // Normalize the direction vector from r0 to rf
@@ -91,6 +92,7 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
         
         	// Atomically add the segment length to the flux tally for this voxel
         	atomicAdd(&grid[idx], (double)segment);
+            particle_flux += (double)segment;
 	}
 
         // Advance to the next intersection point
@@ -126,6 +128,7 @@ inline __device__ void flux (float3 r0, float3 rf, double* grid, uint gridSize, 
             break; 
         }
     }
+    return particle_flux;
 }
 
 #endif // FLUX_CUH
