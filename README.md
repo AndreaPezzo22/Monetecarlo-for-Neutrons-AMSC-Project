@@ -37,11 +37,11 @@ The code was written in C++/CUDA to take advantage of the high degree of paralle
 
 Key technical features and optimizations include:
 
-* **Memory Management:** Use of *Unified Memory* (`cudaMallocManaged`) to simplify data transfer between the Host (CPU) and Device (GPU), combined with `__constant__` memory for ultra-fast access to material and region properties in read-only mode.
-* **Launch Strategy (Grid/Block):** The kernel is optimized to launch in blocks of **256 threads**, ensuring perfect Warp utilization (a multiple of 32) and leaving sufficient physical registers for complex transport calculations without bottlenecks.
-* **Stream Compaction (Thrust):** Since particles die (due to absorption or leakage) at different rates, the GPU’s Warps would gradually empty, causing inefficiency (divergence). To solve this problem, the **Thrust** library (`thrust::copy_if`) intervenes at the end of each iteration. Dead particles are discarded, and the indices of live particles are recompressed into a dense array, allowing the GPU to launch only the exact number of blocks needed in the next cycle at 100% efficiency.
-* **Thread-Safe Tallying:** The accumulation of flow in the global grid is performed using `atomicAdd` operations, ensuring that no *race conditions* occur when thousands of threads attempt to write to the same voxel simultaneously.
-* **Numerical Robustness:** Implementation of advanced protections for floating-point arithmetic (FP32), including *Early-Exit* to prevent division by zero (NaN) and *Anti-Sticky Boundary* routines based on the memory-free nature of the exponential distribution to prevent particles from getting stuck on fictitious boundaries.
+* **Memory Management:** use of *Unified Memory* (`cudaMallocManaged`) to simplify data transfer between the Host (CPU) and Device (GPU), combined with `__constant__` memory for ultra-fast access to material and region properties in read-only mode.
+* **Launch Strategy (Grid/Block):** the kernel is optimized to launch in blocks of **256 threads**, ensuring perfect Warp utilization (a multiple of 32) and leaving sufficient physical registers for complex transport calculations without bottlenecks.
+* **Stream Compaction (Thrust):** since particles die (due to absorption or leakage) at different rates, the GPU’s Warps would gradually empty, causing inefficiency (divergence). To solve this problem, the **Thrust** library (`thrust::copy_if`) intervenes at the end of each iteration. Dead particles are discarded, and the indices of live particles are recompressed into a dense array, allowing the GPU to launch only the exact number of blocks needed in the next cycle at 100% efficiency.
+* **Thread-Safe Tallying:** the accumulation of flow in the global grid is performed using `atomicAdd` operations, ensuring that no *race conditions* occur when thousands of threads attempt to write to the same voxel simultaneously.
+* **Numerical Robustness:** implementation of advanced protections for floating-point arithmetic (FP32), including *Early-Exit* to prevent division by zero (NaN) and *Anti-Sticky Boundary* routines based on the memory-free nature of the exponential distribution to prevent particles from getting stuck on fictitious boundaries.
 
 ---
 
@@ -73,13 +73,13 @@ The simulator’s operation is driven by a series of specialized functions distr
 * **`flux(float3 r0, float3 rf, double* grid, uint gridSize, double voxelSize)`**
   * **What it does:** Tracks the linear path of the particle from one point to another through the 3D voxel grid. It analytically calculates the length of the track segment deposited within each intersected voxel and accumulates it in the global grid using the safe `atomicAdd` function.
 * **`prepNextIter(...)`**
-  * **What it does:** It is the decision engine that determines the neutron’s fate at the end of its path:
+  * **What it does:** It determines the neutron’s fate at the end of its path:
     1. **Geometric Boundary:** If the neutron hits a wall before the step is exhausted, it is moved to the boundary. The material is updated or the direction is reversed (if the boundary is reflective). A tiny advance $\epsilon$ (epsilon) is applied to prevent permanent numerical sticking at the boundaries (*Anti-Sticky Boundary*).
     2. **Physical Interaction:** If the step ends within a material, evaluate the cross-section ratio $\Sigma_a/\Sigma_t$. If the stochastic probability dictates absorption, return `false` (neutron death); otherwise, simulate isotropic scattering by resetting the direction and step.
 
 #### 📂 Coordination and Output (`kernel.cuh`, `main.cu`, and `utils.cpp`)
 * **`mainKernel(...)` (CUDA Kernel)**
-  * **What it does:** Represents the execution core launched in parallel on the GPU. For each active thread (retrieved via the compacted array), it calculates the closest geometric distance, determines the actual displacement (`min_step`), invokes `flux` to record the flux in the voxels, and calls `prepNextIter` to update the particle’s state.
+  * **What it does:** for each active thread (retrieved via the compacted array), it calculates the closest geometric distance, determines the actual displacement (`min_step`), invokes `flux` to record the flux in the voxels, and calls `prepNextIter` to update the particle’s state.
 * **`save_to_vtk(...)` (C++)**
   * **What it does:** Executed on the CPU at the end of the simulation. Writes the structured file `output.vtk` containing the scalar values of the accumulated flow per voxel (`track_length`) and the IDs of the voxelized materials. The file is ready to be opened with software such as ParaView.
  
