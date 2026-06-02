@@ -75,10 +75,7 @@ The simulator’s operation is driven by a series of specialized functions distr
 
 ## 🚀 How to compile and execute
 
-### Prerequisiti
-* 
-
-### Compilazione
+### Compilation
 1. Clone the repository in your system:
    ```bash
    git clone https://github.com/AndreaPezzo22/Montecarlo-for-Neutrons-AMSC-Project.git
@@ -179,3 +176,9 @@ The results can be displayed using softwares as ParaView. We suggest to import t
         ├── test
         ├── test.cu
         └── test.o
+```
+## Authors
+
+* Sergio Pisoni sergioenrico.pisoni@mail.polimi.it
+* Andrea Pezzo andrea.pezzo@mail.polimi.it
+* Leonardo Stefanelli leonardo.stefanelli@mail.polimi.it
