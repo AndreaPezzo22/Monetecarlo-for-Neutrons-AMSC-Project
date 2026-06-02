@@ -4,5 +4,7 @@
   "graphite": { "sigma_s": 0.38,  "sigma_a": 0.0003,    "sigma_t": 0.3803 },
   "concrete": { "sigma_s": 0.85,  "sigma_a": 0.08,      "sigma_t": 0.93 },
   "iron":     { "sigma_s": 1.10,  "sigma_a": 0.22,      "sigma_t": 1.32 },
-  "boron":    { "sigma_s": 0.40,  "sigma_a": 20.00,     "sigma_t": 20.40 }
+  "boron":    { "sigma_s": 0.40,  "sigma_a": 20.00,     "sigma_t": 20.40 },
+  "cadmium":  { "sigma_s": 0.32, "sigma_a": 116.7, "sigma_t": 117 },
+  "uranium":  { "sigma_s": 0.43, "sigma_a": 0.37, "sigma_t": 0.8 }
 }
