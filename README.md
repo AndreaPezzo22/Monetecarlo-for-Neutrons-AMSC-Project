@@ -7,6 +7,7 @@ The program tracks the trajectory of a large number of particles within a custom
 - [🔬 State of the Art](#-state-of-the-art)
 - [💻 Architecture and GPU Parallelization (CUDA)](#-architecture-and-gpu-parallelization-cuda)
 - [🛠️ Details and Description of Functions](#️-details-and-description-of-functions)
+- [⚙️ Hardware Resources](#-hardware-resources)
 - [🚀 How to compile and execute](#-how-to-compile-and-execute)
 - [👁️ Visualize the Results](#️-visualize-the-results)
 - [📁 Repository Structure](#-repository-structure)
