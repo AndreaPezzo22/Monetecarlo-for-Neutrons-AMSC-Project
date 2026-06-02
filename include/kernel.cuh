@@ -1,3 +1,30 @@
+/**
+ * @brief Main particle transport kernel.
+ *
+ * @param posx          Array of particle x positions.
+ * @param posy          Array of particle y positions.
+ * @param posz          Array of particle z positions.
+ * @param dirx          Array of particle direction x components.
+ * @param diry          Array of particle direction y components.
+ * @param dirz          Array of particle direction z components.
+ * @param step          Array of distances remaining to the next collision.
+ * @param particle_flux Array of per-particle flux accumulation values.
+ * @param N             Total number of particles.
+ * @param grid          Device pointer to flattened 3D voxel flux tally array.
+ * @param edgeN         Number of voxels along each grid axis.
+ * @param voxelSize     Physical size of each voxel.
+ * @param randState     Array of per-particle curandState values.
+ * @param active_indices Array mapping active particle indices to real particle IDs.
+ * @param num_vive      Number of active particles to process in this kernel launch.
+ * @param alive         Output array indicating whether each real particle remains alive.
+ *
+ * @details
+ *  - Loads active particle state from the real particle arrays.
+ *  - Computes the next step length as the minimum of the remaining collision distance and the distance to the nearest geometry intersection.
+ *  - Tallies flux contributions along the partial track segment.
+ *  - Advances the particle state using `prepNextIter`.
+ *  - Writes updated position, direction, step, and alive status back to the real particle arrays.
+ */
 #ifndef MAIN_KERNEL_CUH
 #define MAIN_KERNEL_CUH 
 

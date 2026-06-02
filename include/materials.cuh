@@ -1,27 +1,20 @@
+/**
+ * @brief Detects the material containing a given particle position.
+ *
+ * @param pos Current position of the particle in 3D space.
+ *
+ * @details
+ *  - Iterates through the device constant region array `c_regions`.
+ *  - If `pos` is inside a region, the function updates the material ID to that region's `mat_id`.
+ *  - If `pos` is not inside any defined region, the function returns the default material ID 0.
+ *
+ * @note The function returns the last matching region's material ID when multiple regions overlap.
+ *       Therefore, regions should be ordered from general to specific, with the most specific
+ *       regions defined last.
+ */
+
 #ifndef MATERIALS_H
 #define MATERIALS_H
-
-// Detects the material where the particle is located based on its position. 
-// This function checks the position against defined regions and returns 
-// the corresponding material ID.
-//
-// Parameters:
-// - pos: the current position of the particle in 3D space.
-// - final_mat_id: the material ID to return if the position is not inside any defined 
-//   region.
-// - inside: a boolean flag indicating whether the position is inside the current region being checked.
-// - r: current region being checked for the particle's position.
-// - c_num_regions: total number of defined regions to check against.
-// - c_regions: array of defined regions with their corresponding material IDs.
-// - mat_id: the material ID to return if the position is inside the current region being checked.
-// 
-// Preconditions:
-// - 
-//
-// Behavior:
-// At each iteration, the function checks if the particle's position is inside any of the defined regions.
-// If it is inside a region, it updates the final material ID to the one corresponding to that region. 
-// If it is not inside any region, it returns the default material ID (Vacuum).
 
 #include "types.h"
 

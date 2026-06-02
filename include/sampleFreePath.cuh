@@ -1,26 +1,22 @@
+/**
+ * @file sampleFreePath.cuh
+ * @brief Samples a free path for a particle based on the material total cross-section.
+ *
+ * @param sigma_t Total cross-section of the current material.
+ * @param state   CURAND state used for random number generation.
+ *
+ * @return Sampled free path distance.
+ *
+ * @pre sigma_t must be a valid float representing the total material cross-section.
+ *
+ * @details
+ *  - If sigma_t <= 0, the function returns `CUDART_INF_F` to indicate an infinite path.
+ *  - Otherwise, it samples a random distance from an exponential distribution using
+ *    `-log(U) / sigma_t` where U is a uniform random number in (0,1).
+ */
+
 #ifndef STEP_H
 #define STEP_H
-
-// Set the step size for a particle based on the total cross-section of the material it is currently in.
-//
-// Parameters:
-// - sigma_t: the total cross-section of the material (sigma_t) where the particle is located.
-// - state: the curandState used for random number generation.
-// - CUDA_INF_F: a constant representing infinity in CUDA, used to indicate that if sigma_t is zero or negative, the step is infinite (no interaction occurs).
-// 
-// Included Functions:
-// - getRandomFloat: a helper function to generate a random float in a specified range using curandState.
-//
-// Preconditions:
-// - sigma_t must be a valid float value representing the total cross-section.
-//
-// Behavior:
-// The function samples a random free path for the particle based on an exponential distribution, 
-// which is commonly used in Monte Carlo simulations of particle transport. If sigma_t is zero 
-// or negative, it returns infinity, indicating that the particle will not interact and can travel indefinitely.
-
-// We must be sure that when we call the function we handle correctly the 
-// CUDART_INF_F value
 
 #include "utils.h"
 
