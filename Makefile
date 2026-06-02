@@ -7,7 +7,7 @@ NVCC = nvcc
 # -rdc=true : Allows __device__ functions to be linked across multiple .cu files
 # -arch     : Target GPU architecture (sm_70 = Volta, sm_75 = Turing, sm_80 = Ampere, sm_89 = Ada/RTX 40 series)
 # -I.       : Look for headers (like helper_math.h) in the current directory
-NVCC_FLAGS = -O3 -rdc=true -arch=sm_80 -Iinclude
+NVCC_FLAGS = -O3 -rdc=true -arch=sm_80 -Iinclude 
 
 # --- Files ---
 # CUDA source files

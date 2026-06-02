@@ -6,6 +6,8 @@
 
 #include <cassert>
 #include <thrust/device_ptr.h>
+#include <thrust/reduce.h>
+#include <thrust/transform_reduce.h>
 #include <thrust/copy.h>
 #include <thrust/execution_policy.h>
 #include <thrust/sequence.h>
