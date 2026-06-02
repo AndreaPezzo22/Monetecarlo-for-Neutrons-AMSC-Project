@@ -3,6 +3,8 @@ This project implements a high-performance 3D neutron transport simulator based 
 
 The program tracks the trajectory of a large number of particles within a customizable domain, handling interactions (scattering, absorption), passage through different materials, and calculating the neutron flux within a three-dimensional grid that can be exported in VTK format (viewable with software such as ParaView).
 
+![Intro Image](images/intro_image.png)
+
 ### Table of Contents
 - [🔬 State of the Art](#-state-of-the-art)
 - [💻 Architecture and GPU Parallelization (CUDA)](#-architecture-and-gpu-parallelization-cuda)
