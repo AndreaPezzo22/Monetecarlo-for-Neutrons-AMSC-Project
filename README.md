@@ -72,6 +72,19 @@ The simulator’s operation is driven by a series of specialized functions distr
   * **What it does:** Represents the execution core launched in parallel on the GPU. For each active thread (retrieved via the compacted array), it calculates the closest geometric distance, determines the actual displacement (`min_step`), invokes `flux` to record the flux in the voxels, and calls `prepNextIter` to update the particle’s state.
 * **`save_to_vtk(...)` (C++)**
   * **What it does:** Executed on the CPU at the end of the simulation. Writes the structured file `output.vtk` containing the scalar values of the accumulated flow per voxel (`track_length`) and the IDs of the voxelized materials. The file is ready to be opened with software such as ParaView.
+ 
+## ⚙️ Hardware Resources
+
+The experiment ran on a single node of the Politecnico of Milan cluster. The simulation took place with a single GPU for the particle parallelization. In particular, the characteristics of the node that has been used are:
+* CPU
+  * Model: 2x Intel(R) Xeon(R) Gold 5520+ configured in a double socket architecture (NUMA).
+  * Core and Thread: a total of 56 physical cores (28 per processor) and 112 logical threads.
+  * Frequency: dynamic clock speed capable of reaching a peak of 4.0 GHz.
+  * Cache: 105 MiB of L3 cache, which is essential for reducing data access times during intensive processing.
+* GPU
+  * Model: 2x NVIDIA L4.
+  * VRAM: 24 GB of dedicated memory for each graphics card.
+  * Software ecosystem: CUDA 13.0.
 
 ## 🚀 How to compile and execute
 
@@ -155,30 +168,11 @@ The results can be displayed using softwares as ParaView. We suggest to import t
 │   ├── main.cu
 │   ├── main.o
 │   ├── utils.cpp
-│   └── utils.o
-└── tests
-    ├── flux
-    │   ├── Makefile
-    │   └── test.cu
-    ├── getMaterial
-    │   ├── Makefile
-    │   ├── test.cu
-    │   └── test.o
-    ├── init
-    │   ├── Makefile
-    │   ├── test
-    │   └── test.cu
-    ├── prepNextIter
-    │   ├── Makefile
-    │   └── test.cu
-    └── step
-        ├── Makefile
-        ├── test
-        ├── test.cu
-        └── test.o
+└── └── utils.o
+
 ```
 ## Authors
 
-* Sergio Pisoni sergioenrico.pisoni@mail.polimi.it
+* Sergio Enrico Pisoni sergioenrico.pisoni@mail.polimi.it
 * Andrea Pezzo andrea.pezzo@mail.polimi.it
 * Leonardo Stefanelli leonardo.stefanelli@mail.polimi.it
