@@ -106,7 +106,7 @@ The experiment ran on a single node of the Politecnico of Milan cluster. The sim
    ```bash
    make
    ```
-3. To execute the simulation, you can either use one of the ready-to-use experiments within the `configurations` directory or create a custom one using the same JSON format. Alternatively, if you just want to try the code, execute it without specifying a filename, since it calls a default configuration automatically.
+3. To execute the simulation, you can either use one of the ready-to-use experiments within the `configurations` directory or create a custom one using the same JSON format. Alternatively, if you just want to try the code, execute it without specifying a filename, it calls a `default.json` configuration automatically.
 
 * **Custom Experiment**
   Within the `configurations` directory, create a new JSON file substituting the correct values:

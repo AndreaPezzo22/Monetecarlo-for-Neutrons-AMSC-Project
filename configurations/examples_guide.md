@@ -1,22 +1,23 @@
-# Domain Handling
+# Examples of Possible Experiments 
 
-### Table of Contents
-- [Domain Definition Guide](#domain-definition-guide)
-- [Examples of Possible Experiments](#examples-of-possible-experiments)
-  - [1. Experiment: multilayered_wall](#1-experiment-multilayered_wall)
-  - [2. Esperimento: matrioska_cube](#2-esperimento-matrioska_cube)
-  - [3. Experiment: maze](#3-experiment-maze)
-  - [4. Esperimento: slit_collimator](#4-esperimento-slit_collimator)
-  - [5. Experiment: kernel_pattern](#5-experiment-kernel_pattern)
+- [0. default](#0-default)
+- [1. multilayered_wall](#1-multilayered_wall)
+- [2. matrioska_cube](#2-matrioska_cube)
+- [3. maze](#3-maze)
+- [4. slit_collimator](#4-slit_collimator)
+- [5. kernel_pattern](#5-kernel_pattern)
 - [References](#references)
 
-## Domain Definition Guide
+## 0. default
 
-### 
+This simple domain compares neutron propagation between two contrasting materials to verify that the simulation software's baseline physics are functioning as expected. 
 
-## Examples of Possible Experiments 
+The setup demonstrates the behavioral difference between **Boron**, a material with a highly significant absorption cross-section that quickly captures incoming particles, and **Graphite**, which possesses a very low absorption cross-section and remains virtually transparent to neutrons. This contrast serves as a fundamental validation test for the program's transport calculations.
 
-### 1. Experiment: multilayered_wall
+
+![Default](../images/default.png)
+
+## 1. multilayered_wall
 
 This experiment simulates the classic configuration of protective shields used in nuclear laboratories. The goal is to block a directional neutron beam by utilizing three materials with complementary physical properties [1].
 
@@ -24,7 +25,7 @@ The neutron first encounters a thick block of **Iron**, whose purpose is to redu
 
 ![Multilayered Wall](../images/multilayered_wall.png)
 
-### 2. Esperimento: matrioska_cube
+## 2. matrioska_cube
 
 Simulate a point source embedded in the center of a massive solid moderator.
 
@@ -32,7 +33,7 @@ The simulated physical dynamics predict that the neutrons will travel through th
 
 ![Matrioska Cube](../images/matrioska_cube.png)
 
-### 3. Experiment: maze
+## 3. maze
 
 A geometry designed to calculate parasitic radiation streaming along the corridors of accelerators or radiation therapy rooms. Neutrons don't like straight lines; this experiment tests whether they can “turn the corner” [2].
 
@@ -40,13 +41,13 @@ Neutrons are fired into an “L”-shaped tunnel. The **concrete** walls tend to
 
 ![Maze](../images/maze.png)
 
-### 4. Esperimento: slit_collimator
+## 4. slit_collimator
 
 In this experiment, a microscopic vacuum tunnel is surrounded by **cadmium**. This material has highly absorptive properties, so only neutrons whose trajectory is parallel to the tunnel axis survive.
 
 ![Slit Collimator](../images/slit_collimator.png)
 
-### 5. Experiment: kernel_pattern
+## 5. kernel_pattern
 
 A miniature reproduction of the internal topology of the core of a pressurized water reactor, where the fuel and moderator are arranged in a checkerboard pattern.
 
