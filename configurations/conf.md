@@ -6,6 +6,8 @@ This experiment simulates the classic configuration of protective shields used i
 
 The neutron first encounters a thick block of **Iron**, whose purpose is to reduce the kinetic energy of the fastest neutrons through hard inelastic collisions. It then enters **Water** (the moderator par excellence), where collisions with hydrogen nuclei slow the particle down to thermal energies. Finally, the now-slow neutrons strike **Boron**, which has a very high absorption cross-section and acts as a final “sponge.”
 
+![Multilayered Wall](../images/multilayered_wall.jpg)
+
 ## 2. Esperimento: matrioska_cube"
 
 Simulate a point source embedded in the center of a massive solid moderator.
