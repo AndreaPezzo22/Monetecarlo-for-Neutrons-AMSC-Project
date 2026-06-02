@@ -9,6 +9,7 @@ The program tracks the trajectory of a large number of particles within a custom
 - [🛠️ Details and Description of Functions](#️-details-and-description-of-functions)
 - [⚙️ Hardware Resources](#-hardware-resources)
 - [🚀 How to compile and execute](#-how-to-compile-and-execute)
+- [📐 How to define the Simulation Parameters & Domain](#-how-to-define-the-simulation-parameters--domain)
 - [👁️ Visualize the Results](#️-visualize-the-results)
 - [📁 Repository Structure](#-repository-structure)
 - [Authors](#authors)
@@ -98,7 +99,6 @@ The experiment ran on a single node of the Politecnico of Milan cluster. The sim
 
 ## 🚀 How to compile and execute
 
-### Compilation
 1. Clone the repository in your system:
    ```bash
    git clone https://github.com/AndreaPezzo22/Montecarlo-for-Neutrons-AMSC-Project.git
@@ -107,41 +107,104 @@ The experiment ran on a single node of the Politecnico of Milan cluster. The sim
    ```bash
    make
    ```
-3. To execute the simulation, you can either use one of the ready-to-use experiments within the `configurations` directory or create a custom one using the same JSON format. Alternatively, if you just want to try the code, execute it without specifying a filename, it calls a `default.json` configuration automatically.
+3. Run the executable
+   ```bash
+   ./sim [config_name]
+   ```
+   The program expects the corresponding configuration file to be located at `configurations/[config_name].json`, relative to your current working directory.
+   More information on how to define the simulation parameters and Domain in the next 
 
-* **Custom Experiment**
-  Within the `configurations` directory, create a new JSON file substituting the correct values:
-  ```json
-  {
-      "numParticles": number_of_particles,
-      "numGridIntervals": number_of_intervals, 
-      "source": { "min_x": min_x, "max_x": max_x, "min_y": min_y, "max_y": max_y, "min_z": min_z, "max_z": max_z },
-      "default": "default_material",
-      "regions": [
-          { "min_x": min_x, "max_x": max_x, "min_y": min_y, "max_y": max_y, "min_z": min_z, "max_z": max_z, "material_name": "name_of_the_material" }
-      ]
-  }
-  ```
-  In the main directory of the project run the execution command as
-  ```bash 
-  ./sim configurations/name_of_the_configuration   
-  ```
-* **Experiment of the library**
-  Choose between one of the available experiments, a clear explanation is available [here](https://github.com/AndreaPezzo22/Montecarlo-for-Neutrons-AMSC-Project/blob/main/configurations/conf.md).
-  ```bash 
-  ./sim configurations/name_of_the_configuration
-  ```
+   If `[config_name]` is omitted, the simulation defaults to `configurations/default.json`, a basic domain that serves as a proof of concept.
 
-* **Default**
-  ``` bash
-  ./sim
-  ```
-    
+> **Note:** Examples of possible configurations are already present in the `configurations/` directory, and are explained in `configurations/examples_guide.json`
+
+## 📐 How to define the Simulation Parameters & Domain
+
+The utility of such a simulator relies on the efficient configuration of diverse simulation scenarios.
+
+To achieve this we opted for JSON-based Parameters definition, the domain geometry is constructed using Axis-Aligned Bounding Boxes (AABBs) to define discrete regions within the simulation space.
+
+### Configuration File Structure
+
+To configure a simulation, create a new JSON file within the configurations directory. Below, an example from `configurations/default.json`:
+
+```json
+{
+    "numParticles": 10000000,
+    "numGridIntervals": 100,
+    "source": {
+        "min_x": -0.5, "max_x": 0.5,
+        "min_y": -0.5, "max_y": 0.5,
+        "min_z": -0.5, "max_z": 0.5
+    },
+    "default": "vacuum",
+    "regions": [
+        {
+            "min_x": -3.0, "max_x": 0.0,
+            "min_y": -3.0, "max_y": 3.0,
+            "min_z": -3.0, "max_z": 3.0,
+            "material_name": "boron"
+        },
+        {
+            "min_x": 0.0, "max_x": 3.0,
+            "min_y": -3.0, "max_y": 3.0,
+            "min_z": -3.0, "max_z": 3.0,
+            "material_name": "graphite"
+        }
+    ]
+}
+```
+
+Parameter Specifications:
+
+* `numParticles` (integer): The total number of independent Monte Carlo particle histories to simulate.
+* `numGridIntervals` (integer): Specifies the spatial granularity. The global domain will be divided by this number along each axis to construct the 3D voxel grid used to tally the scalar flux.
+* `source`: The bounding box defining the spatial limits within which initial particle positions are uniformly sampled.
+* `default` (string): The background material assigned to any space within the domain that is not explicitly covered by a defined region.
+* `regions`: An array of objects defining discrete AABBs and their associated materials. You can define an arbitrary number of regions, and the material_name can be completely distinct from other regions and the default material.
+* **Overlap Priority**: Regions are evaluated sequentially. If spatial boundaries overlap, the region defined last in the array has the highest priority and will overwrite preceding material assignments in the intersected volume.
+* **Units**: All spatial coordinates (min_x, max_x, etc.) must be expressed in $cm$.
+
+### Material Definitions (materials.json)
+
+Any `material_name` (and `default`) referenced in a configuration file must correspond to an explicit entry in `configurations/materials.json`. Cross-sections ($\Sigma_s$, $\Sigma_a$, $\Sigma_t$) must be expressed in $cm^{-1}$.
+
+```json
+{
+  "vacuum":   { "sigma_s": 0.00,  "sigma_a": 0.00,      "sigma_t": 0.00 },
+  "water":    { "sigma_s": 3.45,  "sigma_a": 0.022,     "sigma_t": 3.472 },
+  "graphite": { "sigma_s": 0.38,  "sigma_a": 0.0003,    "sigma_t": 0.3803 },
+  "concrete": { "sigma_s": 0.85,  "sigma_a": 0.08,      "sigma_t": 0.93 },
+  "iron":     { "sigma_s": 1.10,  "sigma_a": 0.22,      "sigma_t": 1.32 },
+  "boron":    { "sigma_s": 0.40,  "sigma_a": 20.00,     "sigma_t": 20.40 },
+  "cadmium":  { "sigma_s": 0.32,  "sigma_a": 116.7,     "sigma_t": 117 },
+  "uranium":  { "sigma_s": 0.43,  "sigma_a": 0.37,      "sigma_t": 0.8 }
+}
+```
+### Normalization
+
+To standardize the simulation logic across the different possible domains, the program automatically normalizes the configured physical domain into a dimensionless unit cube $[0, 1]^3$. 
+
+This process consists of four main steps:
+
+1. **Offsetting:** The program calculates the global bounding box encompassing all defined regions and the source. The global minimums ($x_{min}, y_{min}, z_{min}$) are used as offsets to shift the entire geometry so that its bottom-left-rear corner rests at the origin $(0,0,0)$.
+
+2. **Scaling Lengths:** The maximum physical span across all three axes ($L_{max}$) is determined. Every spatial coordinate is then shifted and scaled to fit within the unit cube:
+$$x_{scaled} = \frac{x - x_{min}}{L_{max}}$$
+
+3. **Scaling Physics (Cross-Sections):** Because the physical free path is calculated as $l = \frac{-\ln(\xi)}{\Sigma_{t}}$, dividing the physical length by $L_{max}$ requires multiplying the macroscopic cross-section ($\Sigma_t$, measured in inverse length $cm^{-1}$) by the same factor to maintain identical transport behavior. The code automatically applies:
+$$\Sigma_{scaled} = \Sigma_t \cdot L_{max}$$
+
+4. **Default Background Initialization:** After scaling, the simulator automatically creates a foundational region that perfectly spans the entire normalized $[0, 1]^3$ domain. This region is assigned the `default` material and is processed with the lowest priority. This guarantees that any empty space not explicitly covered by a custom region is filled with the background material.
+
+> **Practical Takeaway for Configuration:** You do not need to manually center your domain at the origin, restrict your coordinates to a specific range, or define a bounding box for the default background. Define the geometry using exact physical dimensions; the simulator handles all spatial mapping, cross-section adjustments, and background initialization internally.
+
 ## 👁️ Visualize the Results   
 
 The results can be displayed using softwares as ParaView. We suggest to import the file output.vtk with the following settings:
 * Volume view of the object.
 * Filter the values using the threshold filter and adjusting the minimum and maximum values.
+> **Note:** Dimensions in the visualization will be normalized on a $[0,1]^3$ unit cube.
 
 ## 📁 Repository Structure
 
