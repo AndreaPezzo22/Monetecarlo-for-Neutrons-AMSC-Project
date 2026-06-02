@@ -81,7 +81,7 @@ The simulator’s operation is driven by a series of specialized functions distr
 ### Compilazione
 1. Clone the repository in your system:
    ```bash
-   git clone [https://github.com/](https://github.com/)[TuoUsername]/Montecarlo-for-Neutrons-AMSC-Project.git
+   git clone https://github.com/AndreaPezzo22/Montecarlo-for-Neutrons-AMSC-Project.git
    cd Montecarlo-for-Neutrons-AMSC-Project
 2. Within the new directory compile using the command
    ```bash
