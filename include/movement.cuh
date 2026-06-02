@@ -1,4 +1,10 @@
-// Device functions used to handle particle movement in the domain
+/**
+ * @file movement.cuh
+ * @brief Device helpers for particle movement and geometry intersection tests.
+ *
+ * This file provides ray/AABB intersection utilities and distance queries for
+ * the global domain and material regions stored in device constant memory.
+ */
 #ifndef MOVEMENT_CUH
 #define MOVEMENT_CUH
 
@@ -8,7 +14,16 @@
 extern __constant__ Region c_regions[]; 
 extern __constant__ int c_num_regions; 
 
-// Slab method function to check for intersections with Axis Aligned Bounding Box (domain)
+/**
+ * @brief Computes the intersection distance between a ray and an axis-aligned bounding box.
+ *
+ * @param pos     Ray origin position.
+ * @param inv_dir Reciprocal ray direction components (1/dir) for each axis.
+ * @param box_min Minimum corner of the axis-aligned bounding box.
+ * @param box_max Maximum corner of the axis-aligned bounding box.
+ *
+ * @return Distance along the ray to the nearest intersection with the box, or -1.0f if no intersection.
+ */
 inline __device__ float intersectAABB(float3 pos, float3 inv_dir, float3 box_min, float3 box_max) {
     float tx1 = (box_min.x - pos.x) * inv_dir.x;
     float tx2 = (box_max.x - pos.x) * inv_dir.x;
@@ -35,6 +50,14 @@ inline __device__ float intersectAABB(float3 pos, float3 inv_dir, float3 box_min
     return -1.0f; // Represents no intersection
 }
 
+/**
+ * @brief Finds the nearest geometry intersection distance for a particle ray.
+ *
+ * @param pos Starting particle position.
+ * @param dir Particle direction vector.
+ *
+ * @return Distance to the nearest domain or material-region intersection.
+ */
 inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir){
     float closest_dist = 1.7320508f; // sqrt(3)
     
@@ -61,7 +84,7 @@ inline __device__ float getDistanceToNearestIntersection(float3 pos, float3 dir)
         }
     }
 
-    // Return the closest distance if an intersection occurred before 'step', otherwise return -1.0f
+    // Return the closest distance found for domain or material-region intersections.
     return closest_dist;
 }
 

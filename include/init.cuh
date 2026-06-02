@@ -1,17 +1,30 @@
-// This file defines the kernel for setting up the simulation system (read kernel actions for more informations)
-//
-// Parameters:
-//  - posx, posy, posz: Arrays of length N containing the x, y, z coordinates of the N particles.
-//  - dirx, diry, dirz: Arrays of length N containing the x, y, z components of the direction vectors for the N particles.
-//  - randState: Array of length N containing the curandState for each particle, used for random number generation. 
-//  - N: The number of particles in the simulation.
-//  - seed: The seed for the random number generator.
-//
-// Kernel actions:
-//  - Initializes the random state for each particle using curand_init.
-//  - Sets the initial random positions of the particles inside the simulation domain.
-//  - Sets the initial random direction vectors for the particles.
-//  - TODO: restrain positions of particles according to given constraints passed as parameter.
+/**
+ * @brief Initializes particle state for the simulation.
+ *
+ * @param posx          Output array of particle x positions.
+ * @param posy          Output array of particle y positions.
+ * @param posz          Output array of particle z positions.
+ * @param dirx          Output array of particle direction x components.
+ * @param diry          Output array of particle direction y components.
+ * @param dirz          Output array of particle direction z components.
+ * @param step          Output array of distances to the next collision.
+ * @param particle_flux Output array for per-particle flux accumulation.
+ * @param randState     Input/output array of per-particle curandState.
+ * @param N             Number of particles.
+ * @param seed          Seed for random number generation.
+ * @param source        Source region used to sample initial particle positions.
+ *
+ * Kernel actions:
+ *  - Initializes the random state for each particle using curand_init.
+ *  - Samples the initial position of each particle inside the source bounds.
+ *  - Samples the initial direction of each particle using getRandomDirection.
+ *  - Computes the initial material index at the particle position and samples the first free path.
+ *  - Stores the updated curand state back to global memory.
+ *
+ * Note:
+ *  - The source region is used directly for position sampling.
+ *  - Particle positions are not additionally constrained beyond the source bounds in this kernel.
+ */
 
 #ifndef INIT_CUH
 #define INIT_CUH

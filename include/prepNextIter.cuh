@@ -1,23 +1,16 @@
-// Prepare the next iteration of the particle transport simulation, computing new random
-// direction if a reaction occurs, handling the particle's behaviour at boundaries, and
-// updating the material in case of a change of material.
-//
-// Parameters:
-//  - intersectionPoint: closest intersection point for the particle with the geometry
-//  - s: random step size sampled previously for the particle
-//  - r: current particle position
-//  - d: particle direction (normalized vector)
-//  - material: current material index of the particle
-//  - state: random state for generating new random numbers
-//
-// Preconditions:
-//  - r is inside the unit cube [0,1]^3.
-//
-// Behavior:
-// If the closest intersection is closer than the sampled step size, we move the
-// particle to the intersection point and either reflect at the boundary or update
-// the material. Otherwise we advance by the sampled step and choose a new random
-// direction.
+/**
+ * @file prepNextIter.cuh
+ * @brief Prepares the next transport iteration for a particle.
+ *
+ * This module updates particle position, direction, material state, and step size
+ * after a movement step or geometry intersection.
+ *
+ * @details
+ *  - If the particle intersects geometry before its sampled step, it is moved to the
+ *    intersection and either reflected or transitioned into a new material.
+ *  - If the particle travels the full sampled step without intersecting geometry, it
+ *    advances and may be absorbed or continue with a new sampled path.
+ */
 
 #ifndef PREP_NEXT_ITER_CUH
 #define PREP_NEXT_ITER_CUH
@@ -31,6 +24,18 @@ extern __constant__ Material c_materials[10];
 
 const int BOUNDARY_TYPE_REFLECTIVE = 0;
 
+/**
+ * @brief Advances particle state after a movement step or geometry intersection.
+ *
+ * @param distanceToIntersection Distance to the closest geometry intersection.
+ * @param step                   Remaining distance to the next sampled collision.
+ * @param particlePos            Current particle position (updated in place).
+ * @param dir                    Current particle direction (updated in place).
+ * @param material               Current material index (updated if material changes).
+ * @param state                  CURAND state used for sampling new directions and free paths.
+ *
+ * @return true if the particle remains alive, false if it is absorbed or lost.
+ */
 inline __device__ bool prepNextIter(const float distanceToIntersection,
                                    float &step,
                                    float3 &particlePos,

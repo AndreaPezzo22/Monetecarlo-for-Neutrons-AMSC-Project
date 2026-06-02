@@ -1,23 +1,23 @@
-// Compute and accumulate voxel flux contributions for a particle track
-//
-// Parameters:
-//  - r0: starting particle position in normalized domain coordinates [0,1]^3
-//  - rf: ending particle position in normalized domain coordinates [0,1]^3
-//  - grid: device pointer to flattened 3D voxel flux tally array (size gridSize^3)
-//  - gridSize: number of voxels along each axis (assuming cubic grid)
-//  - voxelSize: physical size of each voxel (in domain units, e.g., 1.0/gridSize)
-//
-// Preconditions:
-//  - Both r0 and rf are inside the unit cube [0,1]^3.
-//  - grid has exactly gridSize * gridSize * gridSize entries.
-//  - The direction from r0 to rf is nonzero (i.e., r0 != rf).
-//  - gridSize > 0 and voxelSize > 0.
-//
-// Behavior:
-//  - Traces the straight-line segment from r0 to rf through the voxel grid.
-//  - For each voxel intersected by the segment, adds the length of the segment within that voxel to the corresponding grid entry.
-//  - Uses atomic addition to handle concurrent writes in parallel CUDA kernels.
-//  - Assumes row-major ordering for the flattened 3D array: idx = x + y*gridSize + z*gridSize*gridSize
+/**
+ * @brief Computes and accumulates voxel flux contributions for a particle track.
+ *
+ * @param r0        Starting particle position in normalized domain coordinates [0,1]^3.
+ * @param rf        Ending particle position in normalized domain coordinates [0,1]^3.
+ * @param grid      Device pointer to flattened 3D voxel flux tally array (size gridSize^3).
+ * @param gridSize  Number of voxels along each axis (assuming cubic grid).
+ * @param voxelSize Physical size of each voxel (in domain units, e.g., 1.0/gridSize).
+ *
+ * @pre Both r0 and rf are inside the unit cube [0,1]^3.
+ * @pre grid has exactly gridSize * gridSize * gridSize entries.
+ * @pre The direction from r0 to rf is nonzero (i.e., r0 != rf).
+ * @pre gridSize > 0 and voxelSize > 0.
+ *
+ * @details
+ *  - Traces the straight-line segment from r0 to rf through the voxel grid.
+ *  - For each voxel intersected by the segment, adds the length of the segment within that voxel to the corresponding grid entry.
+ *  - Uses atomic addition to handle concurrent writes in parallel CUDA kernels.
+ *  - Assumes row-major ordering for the flattened 3D array: idx = x + y*gridSize + z*gridSize*gridSize.
+ */
 
 #ifndef FLUX_CUH
 #define FLUX_CUH
