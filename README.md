@@ -3,6 +3,15 @@ This project implements a high-performance 3D neutron transport simulator based 
 
 The program tracks the trajectory of a large number of particles within a customizable domain, handling interactions (scattering, absorption), passage through different materials, and calculating the neutron flux within a three-dimensional grid that can be exported in VTK format (viewable with software such as ParaView).
 
+### Table of Contents
+- [🔬 State of the Art](#-state-of-the-art)
+- [💻 Architecture and GPU Parallelization (CUDA)](#-architecture-and-gpu-parallelization-cuda)
+- [🛠️ Details and Description of Functions](#️-details-and-description-of-functions)
+- [🚀 How to compile and execute](#-how-to-compile-and-execute)
+- [👁️ Visualize the Results](#️-visualize-the-results)
+- [📁 Repository Structure](#-repository-structure)
+- [Authors](#authors)
+
 ## 🔬 State of the Art
 
 Monte Carlo simulations are used to numerically approximate quantities of interest by simulating a high number of independent and identically distributed (i.i.d.) events and averaging the outcomes. Particle transport processes are highly amenable to this approach, as individual particle histories can often be considered independent. The idea is to trace out a number of neutron histories, simulating the interactions that occur along a neutron's flight path, while keeping track of the flux contribution of individual particles.
