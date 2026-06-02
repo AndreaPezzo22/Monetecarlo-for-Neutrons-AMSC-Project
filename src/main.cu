@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     // -- Allocate compaction arrays
     int* active_indices;
     int* alive;
-    int *compacted_indices;
+    int* compacted_indices;
     cudaMallocManaged(&active_indices, sizeof(int) * N);
     cudaMallocManaged(&alive, sizeof(int) * N);
     cudaMallocManaged(&compacted_indices, sizeof(int) * N);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     CUDA_CHECK(cudaGetLastError());       // Catches launch errors (e.g., invalid grid size)
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
 
-    uint edgeN = 100;
+    uint edgeN = domain.getNumGridIntervals();
     uint gridSize = edgeN * edgeN * edgeN;
     double voxelSize = 1.0 / edgeN;
 
