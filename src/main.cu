@@ -137,24 +137,37 @@ int main(int argc, char* argv[]) {
     }
 
     CUDA_CHECK(cudaDeviceSynchronize());  // Catches execution errors (e.g., memory violation inside the kernel)
+    
+    // Divide the computed length per voxel by voxel volume to get flux
+    thrust::device_ptr<double> begin_grid(grid);
+    thrust::device_ptr<double> end_grid = begin_grid + gridSize;
+
+    double voxelVolume = 1.0 / gridSize;  // or whatever your actual voxel volume is
+
+    thrust::transform(begin_grid, end_grid, begin_grid,
+    [voxelVolume] __device__ (double x) { return x / voxelVolume; });
+
     auto t1 = std::chrono::steady_clock::now();
     double seconds = std::chrono::duration<double, std::milli>(t1 - t0).count() * 1e-3;
 
     // --------------------------------------------------------------------
     // ── Statistics: Compute mean and variance of particle flux
 
-    // Reduce sums all elements. The '0.0f' is the initial value.
-    thrust::device_ptr<double> begin(particle_flux);
-    thrust::device_ptr<double> end = begin + N;
+    thrust::device_ptr<double> begin_particle_flux(particle_flux);
+    thrust::device_ptr<double> end_particle_flux = begin_particle_flux + N;
 
-    double sum = thrust::reduce(begin, end, 0.0, thrust::plus<double>());
+    thrust::transform(begin_particle_flux, end_particle_flux, begin_particle_flux,
+    [voxelVolume] __device__ (double x) { return x / voxelVolume; });
+
+    // Reduce sums all elements. The '0.0' is the initial value.
+    double sum = thrust::reduce(begin_particle_flux, end_particle_flux, 0.0, thrust::plus<double>());
     double mean = sum / N;
 
     // --- COMPUTE VARIANCE ---
     // transform_reduce applies the functor, then sums the results
     double variance_sum = thrust::transform_reduce(
-        begin, 
-        end, 
+        begin_particle_flux, 
+        end_particle_flux, 
         SquaredDeviation(mean), 
         0.0, 
         thrust::plus<double>()
@@ -170,8 +183,8 @@ int main(int argc, char* argv[]) {
     // Output results
     std::cout << "Mean:             " << mean << "\n";
     std::cout << "Std Dev:          " << std_dev << "\n";
-    std::cout << "Relative Error:   " << relative_error * 100.0 << " %\n"; // Assuming expected mean is 1.0 for demonstration
-    std::cout << "FOM:              " << 1 / (relative_error * seconds) << "\n";
+    std::cout << "Relative Error:   " << relative_error * 100.0 << " %\n";
+    std::cout << "FOM:              " << 1.0 / (relative_error * relative_error * seconds) << "\n";
 
     if (particelle_vive > 0) {
         std::cout << "Simulation ended after reaching the maximum number of iterations (" << max_iter << ")." << std::endl;
